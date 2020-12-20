@@ -1,22 +1,34 @@
+import math
 import random
 from typing import Tuple
+
+from MatchmakerConditions import (SHIP_TYPE_DIFFERENCE, TEAM_SIZE, TEAMS_NUM,
+                                  BattleGroup, Team)
 from player import PlayerType
-from MatchmakerConditions import BattleGroup, SHIP_TYPE_DIFFERENCE, TEAMS_NUM, TEAM_SIZE
-import math
 
 INITIAL_TEMP = 1
 TEMP_DECREASE_COEFFICIENT = 0.9
 
 
+class SimulatedAnnealingMatchmakerLogger:
+    def logIteration(self, iteration, temperature, energy):
+        print(iteration, temperature, energy)
+
+    def logPlayer(self, player):
+        print(player.type)
+
+
 class SimulatedAnnealingMatchmaker:
     def __init__(self):
-        self.GENERATE_ACTIONS = [self.swapTeamMembers, self.addPlayer, self.removePlayer]
+        self.GENERATE_ACTIONS = [self.swapTeamMembers,
+                                 self.addPlayer, self.removePlayer]
 
         self.queue = []
         self.__initProcess()
 
     def __initProcess(self):
-        self.__currentBattleGroup = BattleGroup(size=TEAMS_NUM)
+        teams = [Team() for _ in range(TEAMS_NUM)]
+        self.__currentBattleGroup = BattleGroup(teams)
         self.__prev_energy = self.__getEnergy(self.__currentBattleGroup)
         self.current_temperature = INITIAL_TEMP
 
@@ -35,7 +47,8 @@ class SimulatedAnnealingMatchmaker:
             return True, resultBattleGroup
 
         if current_energy < self.__prev_energy:
-            prob = math.exp(-(current_energy - self.__prev_energy) / self.current_temperature)
+            prob = math.exp(-(current_energy - self.__prev_energy) /
+                            self.current_temperature)
             if random.random() < prob:
                 self.__currentBattleGroup = current_candidate
         else:
@@ -62,22 +75,23 @@ class SimulatedAnnealingMatchmaker:
 
         if team1.size == 0 or team2.size == 0:
             return False
-        
+
         playerTeam1 = random.choice(team1.divisions)
         team1.removePlayer(playerTeam1)
-        
+
         playerTeam2 = random.choice(team2.divisions)
         team2.removePlayer(playerTeam2)
-        
+
         team1.addPlayer(playerTeam2)
         team2.addPlayer(playerTeam1)
-        
+
         return True
 
     def addPlayer(self, battleGroup):
         if not self.queue:
             return False
-        vacantTeams = [team for team in battleGroup.teams if team.size < TEAM_SIZE]
+        vacantTeams = [
+            team for team in battleGroup.teams if team.size < TEAM_SIZE]
         if not vacantTeams:
             return False
         vacantTeam = random.choice(vacantTeams)
@@ -85,7 +99,8 @@ class SimulatedAnnealingMatchmaker:
         return True
 
     def removePlayer(self, battleGroup):
-        teamsWithPlayers = [team for team in battleGroup.teams if team.size > 0]
+        teamsWithPlayers = [
+            team for team in battleGroup.teams if team.size > 0]
         if not teamsWithPlayers:
             return False
         teamWithPlayers = random.choice(teamsWithPlayers)
@@ -99,7 +114,10 @@ class SimulatedAnnealingMatchmaker:
         for i, team in enumerate(battleGroup.teams):
             for otherTeam in battleGroup.teams[i:]:
                 for playerType in list(PlayerType):
-                    if abs(otherTeam.playersTypesNum[playerType] - team.playersTypesNum[playerType]) > SHIP_TYPE_DIFFERENCE[playerType]:
+                    type_num = team.playersTypesNum[playerType]
+                    other_type_num = otherTeam.playersTypesNum[playerType]
+                    delta_ship_type = abs(type_num - other_type_num)
+                    if delta_ship_type > SHIP_TYPE_DIFFERENCE[playerType]:
                         energy += 1
             if team.size < TEAM_SIZE:
                 energy += 1

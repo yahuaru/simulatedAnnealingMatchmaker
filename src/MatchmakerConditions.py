@@ -22,12 +22,15 @@ TEAM_SIZE = 3
 
 
 class Team:
-    def __init__(self, division=None) -> None:
-        self.divisions = division if division is not None else []
-        self.playersTypesNum = {playerType: 0 for playerType in list(PlayerType)}
+    def __init__(self, division=[]) -> None:
+        self.divisions = division
+        self.playersTypesNum = {
+            playerType: 0 for playerType in list(PlayerType)
+        }
+        self.maxLevel = 0
         for division in self.divisions:
             self.playersTypesNum[division.type] += 1
-        self.maxLevel = max([division.level for division in self.divisions]) if self.divisions else 0
+            self.maxLevel = max(self.maxLevel, division.level)
         self.size = len(self.divisions)
 
     def addPlayer(self, player):
@@ -43,17 +46,25 @@ class Team:
     def copy(self):
         return Team(self.divisions.copy())
 
-    # def addDivision(self, division):
-    #     self.divisions.append(division)
-    #     self.maxLevel = max()
-    #     for player in division:
-    #         self.playersTypesNum[player.type] += 1
+    def __repr__(self) -> str:
+        res = "Team(divisions={}, playersTypeNum={}, maxLevel={}, size={})"
+        return res.format(self.divisions, self.playersTypesNum, self.maxLevel,
+                          self.size)
 
 
 class BattleGroup:
-    def __init__(self, size=0, teams=None) -> None:
-        self.teams = teams if teams is not None else [Team() for _ in range(size)]
+    def __init__(self, teams=[]) -> None:
+        self.teams = teams
+
+    def size(self):
+        return len(self.teams)
 
     def copy(self):
         teams = [team.copy() for team in self.teams]
-        return BattleGroup(teams=teams)
+        return BattleGroup(teams)
+
+    def __repr__(self) -> str:
+        teamsRepr = ""
+        for team in self.teams:
+            teamsRepr += "\t{}\n".format(team)
+        return "BattleGroup[\n{}\n\t]".format(teamsRepr)

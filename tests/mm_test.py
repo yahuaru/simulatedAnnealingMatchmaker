@@ -18,26 +18,30 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
         for i in range(3):
             player = Player(PlayerType.BETA, 0, 0)
             self.mm.enqueueDivision(player)
-            
+
         for i in range(3):
             player = Player(PlayerType.GAMMA, 0, 0)
             self.mm.enqueueDivision(player)
-        
 
         successful = False
         bg = None
         while not successful:
             successful, bg = self.mm.proccessBattleGroups()
-        
+
         self.assertTrue(successful)
         self.assertIsNotNone(bg)
-        
+
         for team in bg.teams:
             self.assertEqual(team.size, TEAM_SIZE)
         for i, team in enumerate(bg.teams):
             for otherTeam in bg.teams[i:]:
                 for playerType in list(PlayerType):
-                    self.assertLessEqual(abs(otherTeam.playersTypesNum[playerType] - team.playersTypesNum[playerType]), SHIP_TYPE_DIFFERENCE[playerType])
+                    type_num = team.playersTypesNum[playerType]
+                    other_type_num = otherTeam.playersTypesNum[playerType]
+                    delta_type = abs(other_type_num - type_num)
+                    max_type_diff = SHIP_TYPE_DIFFERENCE[playerType]
+                    self.assertLessEqual(delta_type, max_type_diff)
+
 
 if __name__ == '__main__':
     unittest.main()
