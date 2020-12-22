@@ -22,8 +22,8 @@ TEAM_SIZE = 3
 
 
 class Team:
-    def __init__(self, division=[]) -> None:
-        self.divisions = division
+    def __init__(self, division=None) -> None:
+        self.divisions = division if division is not None else []
         self.playersTypesNum = {
             playerType: 0 for playerType in list(PlayerType)
         }
@@ -53,8 +53,8 @@ class Team:
 
 
 class BattleGroup:
-    def __init__(self, teams=[]) -> None:
-        self.teams = teams
+    def __init__(self, teams=None) -> None:
+        self.teams = teams if teams is not None else []
 
     def size(self):
         return len(self.teams)
@@ -64,7 +64,7 @@ class BattleGroup:
         return BattleGroup(teams)
 
     def __repr__(self) -> str:
-        teamsRepr = ""
+        teams_repr = ""
         for team in self.teams:
-            teamsRepr += "\t{}\n".format(team)
-        return "BattleGroup[\n{}\n\t]".format(teamsRepr)
+            teams_repr += "\t{}\n".format(team)
+        return "BattleGroup[\n{}\n\t]".format(teams_repr)
