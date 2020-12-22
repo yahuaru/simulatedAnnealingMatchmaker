@@ -19,8 +19,8 @@ class SimulatedAnnealingMatchmakerLogger:
 
 
 class SimulatedAnnealingMatchmaker:
-    def __init__(self, logger):
-        self.GENERATE_ACTIONS = [self.swap_team_members, self.add_player, self.remove_player]
+    def __init__(self, logger=None):
+        self.GENERATE_ACTIONS = [self.swapTeamMembers, self.addPlayer, self.removePlayer]
 
         self.logger = logger
 
@@ -33,27 +33,29 @@ class SimulatedAnnealingMatchmaker:
     def __initProcess(self):
         teams = [Team() for _ in range(TEAMS_NUM)]
         self.__current_battle_group = BattleGroup(teams)
-        self.__prev_energy = self.__get_energy(self.__current_battle_group)
+        self.__prev_energy = self.__getEnergy(self.__current_battle_group)
         self.__current_temperature = INITIAL_TEMP
         self.__current_iteration = 0
 
     def enqueueDivision(self, division):
         self.queue.append(division)
-        self.logger.log_player(division)
+
+        if self.logger:
+            self.logger.logPlayer(division)
 
     def dequeueDivision(self, division):
         self.queue.remove(division)
 
     def proccessBattleGroups(self) -> Tuple:
-        current_candidate = self.__generate_candidate(self.__current_battle_group)
-        current_energy = self.__get_energy(self.__current_battle_group)
+        current_candidate = self.__generateCandidate(self.__current_battle_group)
+        current_energy = self.__getEnergy(self.__current_battle_group)
 
-        self.logger.log_iteration(self.__current_iteration,
-                                  self.__current_temperature, current_energy)
+        if self.logger:
+            self.logger.logIteration(self.__current_iteration, self.__current_temperature, current_energy)
 
         if current_energy == 0:
             result_battle_group = self.__current_battle_group
-            self.__init_process()
+            self.__initProcess()
             return True, result_battle_group
 
         if current_energy < self.__prev_energy:
@@ -91,18 +93,18 @@ class SimulatedAnnealingMatchmaker:
         player_team_1 = None
         if team_1.size != 0:
             player_team_1 = random.choice(team_1.divisions)
-            team_1.remove_player(player_team_1)
+            team_1.removePlayer(player_team_1)
 
         player_team_2 = None
         if team_2.size != 0:
             player_team_2 = random.choice(team_2.divisions)
-            team_2.remove_player(player_team_2)
+            team_2.removePlayer(player_team_2)
 
         if player_team_2 is not None:
-            team_1.add_player(player_team_2)
+            team_1.addPlayer(player_team_2)
 
         if player_team_1 is not None:
-            team_2.add_player(player_team_1)
+            team_2.addPlayer(player_team_1)
 
         return True
 
@@ -113,7 +115,7 @@ class SimulatedAnnealingMatchmaker:
         if not vacant_teams:
             return False
         vacant_team = random.choice(vacant_teams)
-        vacant_team.add_player(self.queue.pop(0))
+        vacant_team.addPlayer(self.queue.pop(0))
         return True
 
     def removePlayer(self, battle_group):
@@ -123,7 +125,7 @@ class SimulatedAnnealingMatchmaker:
             return False
         team_with_players = random.choice(teams_with_players)
         player = random.choice(team_with_players.divisions)
-        team_with_players.remove_player(player)
+        team_with_players.removePlayer(player)
         self.queue.append(player)
 
     @staticmethod
