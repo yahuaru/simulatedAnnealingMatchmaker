@@ -26,7 +26,7 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
         successful = False
         bg = None
         while not successful:
-            successful, bg = self.mm.proccessBattleGroups()
+            successful, bg = self.mm.processBattleGroups()
 
         self.assertTrue(successful)
         self.assertIsNotNone(bg)

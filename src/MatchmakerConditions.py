@@ -48,8 +48,7 @@ class Team:
 
     def __repr__(self) -> str:
         res = "Team(divisions={}, playersTypeNum={}, maxLevel={}, size={})"
-        return res.format(self.divisions, self.playersTypesNum, self.maxLevel,
-                          self.size)
+        return res.format(self.divisions, self.playersTypesNum, self.maxLevel, self.size)
 
 
 class BattleGroup:

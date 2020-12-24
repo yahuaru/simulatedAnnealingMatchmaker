@@ -3,19 +3,28 @@ import random
 from typing import Tuple
 
 from MatchmakerConditions import (SHIP_TYPE_DIFFERENCE, TEAM_SIZE, TEAMS_NUM,
-                                  BattleGroup, Team)
+                                  BattleGroup, Team, MAX_LEVEL_DIFFERENCE)
 from player import PlayerType
 
-INITIAL_TEMP = 1
+INITIAL_TEMP = 8
 TEMP_DECREASE_COEFFICIENT = 0.9
+
+MAX_ITERATIONS = 1000
 
 
 class SimulatedAnnealingMatchmakerLogger:
+    def __init__(self):
+        self.iterations = []
+        self.prob = []
+
     def logIteration(self, iteration, temperature, energy):
-        print(iteration, temperature, energy)
+        self.iterations.append((iteration, temperature, energy))
+
+    def logProb(self, iteration, prob):
+        self.prob.append((iteration, prob))
 
     def logPlayer(self, player):
-        print(player.type)
+        pass
 
 
 class SimulatedAnnealingMatchmaker:
@@ -26,11 +35,23 @@ class SimulatedAnnealingMatchmaker:
 
         self.queue = []
         self.__current_battle_group = None
-        self.__current_temperature = 0
+        self.__current_temperature = INITIAL_TEMP
+        self.__prev_energy = 0
+        self.__current_iteration = 0
+        self.initProcess()
 
-        self.__initProcess()
+    def cleanup(self):
+        self.queue.clear()
+        self.__current_battle_group = None
+        self.__prev_energy = 0
+        self.__current_temperature = INITIAL_TEMP
+        self.__current_iteration = 0
 
-    def __initProcess(self):
+    @property
+    def currentIteration(self):
+        return self.__current_iteration
+
+    def initProcess(self):
         teams = [Team() for _ in range(TEAMS_NUM)]
         self.__current_battle_group = BattleGroup(teams)
         self.__prev_energy = self.__getEnergy(self.__current_battle_group)
@@ -46,28 +67,32 @@ class SimulatedAnnealingMatchmaker:
     def dequeueDivision(self, division):
         self.queue.remove(division)
 
-    def proccessBattleGroups(self) -> Tuple:
+    def processBattleGroups(self) -> Tuple:
         current_candidate = self.__generateCandidate(self.__current_battle_group)
-        current_energy = self.__getEnergy(self.__current_battle_group)
+        current_energy = self.__getEnergy(current_candidate)
 
         if self.logger:
             self.logger.logIteration(self.__current_iteration, self.__current_temperature, current_energy)
 
         if current_energy == 0:
             result_battle_group = self.__current_battle_group
-            self.__initProcess()
+            self.initProcess()
             return True, result_battle_group
 
-        if current_energy < self.__prev_energy:
-            prob = math.exp(-(current_energy - self.__prev_energy) /
-                            self.__current_temperature)
+        if current_energy > self.__prev_energy:
+            prob = math.exp(-(current_energy - self.__prev_energy) / self.__current_temperature)
+            self.logger.logProb(self.currentIteration, prob)
             if random.random() < prob:
                 self.__current_battle_group = current_candidate
+                self.__prev_energy = current_energy
         else:
             self.__current_battle_group = current_candidate
+            self.__prev_energy = current_energy
 
         self.__current_iteration += 1
-        self.__current_temperature = self.__current_temperature * TEMP_DECREASE_COEFFICIENT
+
+        if 1 < self.__current_iteration:
+            self.__current_temperature = INITIAL_TEMP / math.log(1 + self.__current_iteration)
 
         return False, None
 
@@ -131,14 +156,20 @@ class SimulatedAnnealingMatchmaker:
     @staticmethod
     def __getEnergy(battle_group):
         energy = 0
-        for i, team in enumerate(battle_group.teams):
-            for otherTeam in battle_group.teams[i:]:
-                for playerType in list(PlayerType):
-                    type_num = team.playersTypesNum[playerType]
-                    other_type_num = otherTeam.playersTypesNum[playerType]
-                    delta_ship_type = abs(type_num - other_type_num)
-                    if delta_ship_type > SHIP_TYPE_DIFFERENCE[playerType]:
-                        energy += 1
+        for i, team in enumerate(battle_group.teams[:-1]):
+            if team.size > 0:
+                for otherTeam in battle_group.teams[i + 1:]:
+                    for playerType in list(PlayerType):
+                        type_num = team.playersTypesNum[playerType]
+                        other_type_num = otherTeam.playersTypesNum[playerType]
+                        delta_ship_type = abs(type_num - other_type_num)
+                        if delta_ship_type > SHIP_TYPE_DIFFERENCE[playerType]:
+                            energy += 1
+                            break
+
+            else:
+                energy += (TEAMS_NUM - i - 1)
+
             if team.size < TEAM_SIZE:
-                energy += 1
+                energy += (TEAM_SIZE - team.size)
         return energy
