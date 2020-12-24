@@ -1,6 +1,6 @@
 import unittest  # The test framework
 
-from MatchmakerConditions import SHIP_TYPE_DIFFERENCE, TEAM_SIZE
+from MatchmakerConditions import SHIP_TYPE_DIFFERENCE, TEAM_SIZE, TEAMS_NUM
 from player import Player, PlayerType
 from simulatedAnnealing import SimulatedAnnealingMatchmaker
 
@@ -8,18 +8,22 @@ from simulatedAnnealing import SimulatedAnnealingMatchmaker
 class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
     def setUp(self):
         self.mm = SimulatedAnnealingMatchmaker()
+        self.mm.initProcess()
+
+    def tearDown(self) -> None:
+        self.mm.cleanup()
 
     def test_processBattleGroup(self):
 
-        for i in range(3):
+        for i in range(TEAMS_NUM):
             player = Player(PlayerType.ALPHA, 0, 0)
             self.mm.enqueueDivision(player)
 
-        for i in range(3):
+        for i in range(TEAMS_NUM):
             player = Player(PlayerType.BETA, 0, 0)
             self.mm.enqueueDivision(player)
 
-        for i in range(3):
+        for i in range(TEAMS_NUM):
             player = Player(PlayerType.GAMMA, 0, 0)
             self.mm.enqueueDivision(player)
 
@@ -30,6 +34,8 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
 
         self.assertTrue(successful)
         self.assertIsNotNone(bg)
+
+        self.assertEqual(len(self.mm.queue), 0)
 
         for team in bg.teams:
             self.assertEqual(team.size, TEAM_SIZE)
