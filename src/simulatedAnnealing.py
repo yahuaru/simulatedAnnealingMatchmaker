@@ -6,14 +6,15 @@ from MatchmakerConditions import (SHIP_TYPE_DIFFERENCE, TEAM_SIZE, TEAMS_NUM,
                                   BattleGroup, Team, MAX_LEVEL_DIFFERENCE)
 from player import PlayerType
 
-INITIAL_TEMP = 8
 TEMP_DECREASE_COEFFICIENT = 0.9
-
-MAX_ITERATIONS = 1000
 
 
 class SimulatedAnnealingMatchmakerLogger:
     def __init__(self):
+        self.iterations = []
+        self.prob = []
+
+    def cleanup(self):
         self.iterations = []
         self.prob = []
 
@@ -35,7 +36,7 @@ class SimulatedAnnealingMatchmaker:
 
         self.queue = []
         self.__current_battle_group = None
-        self.__current_temperature = INITIAL_TEMP
+        self.__current_temperature = 0
         self.__prev_energy = 0
         self.__current_iteration = 0
         self.initProcess()
@@ -44,7 +45,7 @@ class SimulatedAnnealingMatchmaker:
         self.queue.clear()
         self.__current_battle_group = None
         self.__prev_energy = 0
-        self.__current_temperature = INITIAL_TEMP
+        self.__current_temperature = 0
         self.__current_iteration = 0
 
     @property
@@ -55,7 +56,7 @@ class SimulatedAnnealingMatchmaker:
         teams = [Team() for _ in range(TEAMS_NUM)]
         self.__current_battle_group = BattleGroup(teams)
         self.__prev_energy = self.__getEnergy(self.__current_battle_group)
-        self.__current_temperature = INITIAL_TEMP
+        self.__current_temperature = self.__prev_energy
         self.__current_iteration = 0
 
     def enqueueDivision(self, division):
@@ -81,18 +82,21 @@ class SimulatedAnnealingMatchmaker:
 
         if current_energy > self.__prev_energy:
             prob = math.exp(-(current_energy - self.__prev_energy) / self.__current_temperature)
-            self.logger.logProb(self.currentIteration, prob)
+            if self.logger:
+                self.logger.logProb(self.currentIteration, prob)
             if random.random() < prob:
                 self.__current_battle_group = current_candidate
                 self.__prev_energy = current_energy
         else:
+            if self.logger:
+                self.logger.logProb(self.currentIteration, 1.0)
             self.__current_battle_group = current_candidate
             self.__prev_energy = current_energy
 
         self.__current_iteration += 1
 
         if 1 < self.__current_iteration:
-            self.__current_temperature = INITIAL_TEMP / math.log(1 + self.__current_iteration)
+            self.__current_temperature *= TEMP_DECREASE_COEFFICIENT
 
         return False, None
 
