@@ -75,6 +75,7 @@ class RemovePlayerAction(SimulatedAnnealingAction):
         player = random.choice(team.divisions)
         team.removePlayer(player)
         self.__removed_player = player
+        return True
 
     def on_approved(self, queue):
         queue.append(self.__removed_player)
@@ -170,8 +171,10 @@ class SimulatedAnnealingMatchmaker:
 
         if current_energy > self.__prev_energy:
             prob = math.exp(-(current_energy - self.__prev_energy) / self.__current_temperature)
+
             if self.logger:
                 self.logger.logProb(self.currentIteration, prob)
+
             if random.random() < prob:
                 self.__current_battle_group = current_candidate
                 self.__prev_energy = current_energy
@@ -181,6 +184,7 @@ class SimulatedAnnealingMatchmaker:
         else:
             if self.logger:
                 self.logger.logProb(self.currentIteration, 1.0)
+
             self.__current_battle_group = current_candidate
             self.__prev_energy = current_energy
             self.__last_action.on_approved(self.queue)
@@ -221,14 +225,6 @@ class SimulatedAnnealingMatchmaker:
                             energy += 1
                             break
 
-            else:
-                energy += (TEAMS_NUM - i - 1)
-
-        for i, team in enumerate(battle_group.teams[:-1]):
-            if team.size > 0:
-                for otherTeam in battle_group.teams[i + 1:]:
-                    if abs(team.maxLevel - otherTeam.maxLevel) > MAX_LEVEL_DIFFERENCE:
-                        energy += 1
             else:
                 energy += (TEAMS_NUM - i - 1)
 
