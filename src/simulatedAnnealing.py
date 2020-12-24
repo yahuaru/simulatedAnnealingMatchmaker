@@ -6,7 +6,7 @@ from MatchmakerConditions import (SHIP_TYPE_DIFFERENCE, TEAM_SIZE, TEAMS_NUM,
                                   BattleGroup, Team, MAX_LEVEL_DIFFERENCE)
 from player import PlayerType
 
-TEMP_DECREASE_COEFFICIENT = 0.9
+TEMP_DECREASE_COEFFICIENT = 0.7
 
 
 class SimulatedAnnealingMatchmakerLogger:
@@ -192,7 +192,7 @@ class SimulatedAnnealingMatchmaker:
         self.__current_iteration += 1
 
         if 1 < self.__current_iteration:
-            self.__current_temperature *= TEMP_DECREASE_COEFFICIENT
+            self.__current_temperature = 9 / math.log(1 + self.__current_iteration)
 
         return False, None
 
