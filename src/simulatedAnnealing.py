@@ -95,6 +95,7 @@ class RemoveDivisionAction(SimulatedAnnealingAction):
 
 class SwapDivisionsAction(SimulatedAnnealingAction):
     def execute(self, queue, battle_group):
+        init_size = sum(team.size for team in battle_group.teams)
         teams = list(battle_group.teams)
         team = random.choice(teams)
         teams.remove(team)
@@ -119,12 +120,13 @@ class SwapDivisionsAction(SimulatedAnnealingAction):
 
                 other_team.addDivision(division)
                 team.addDivision(other_division)
+
                 return True
-        elif division is not None:
-            team.addDivision(division)
+        elif division is not None and division.size <= (TEAM_SIZE - other_team.size):
+            team.removeDivision(division)
             other_team.addDivision(division)
             return True
-        elif other_division is not None and (TEAM_SIZE - team.size) <= other_division.size:
+        elif other_division is not None and other_division.size <= (TEAM_SIZE - team.size):
             other_team.removeDivision(other_division)
             team.addDivision(other_division)
             return True
@@ -180,6 +182,7 @@ class SimulatedAnnealingMatchmaker:
 
     def processBattleGroups(self) -> Tuple:
         current_candidate = self.__generateCandidate(self.__current_battle_group)
+        assert len(self.queue) + sum(team.size for team in current_candidate.teams) <= 9
         current_energy = self.__getEnergy(current_candidate)
 
         if self.logger:

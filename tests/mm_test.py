@@ -1,6 +1,6 @@
 import unittest  # The test framework
 
-from MatchmakerConditions import SHIP_TYPE_DIFFERENCE, TEAM_SIZE, TEAMS_NUM
+from MatchmakerConditions import SHIP_TYPE_DIFFERENCE, TEAM_SIZE, TEAMS_NUM, Division
 from player import Player, PlayerType
 from simulatedAnnealing import SimulatedAnnealingMatchmaker
 
@@ -17,15 +17,21 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
 
         for i in range(TEAMS_NUM):
             player = Player(PlayerType.ALPHA, 0, 0)
-            self.mm.enqueueDivision(player)
+            division = Division()
+            division.addPlayer(player)
+            self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
             player = Player(PlayerType.BETA, 0, 0)
-            self.mm.enqueueDivision(player)
+            division = Division()
+            division.addPlayer(player)
+            self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
             player = Player(PlayerType.GAMMA, 0, 0)
-            self.mm.enqueueDivision(player)
+            division = Division()
+            division.addPlayer(player)
+            self.mm.enqueueDivision(division)
 
         successful = False
         bg = None
