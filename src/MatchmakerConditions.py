@@ -21,27 +21,46 @@ TEAMS_NUM = 3
 TEAM_SIZE = 3
 
 
+class Division:
+    def __init__(self):
+        self.players = []
+        self.size = 0
+        self.playersTypesNum = {playerType: 0 for playerType in list(PlayerType)}
+        self.maxLevel = 0
+
+    def addPlayer(self, player):
+        self.size += 1
+        self.players.append(player)
+        self.playersTypesNum[player.type] += 1
+        self.maxLevel = max(self.maxLevel, player.level)
+
+    def __repr__(self):
+        res = "Division(players={}, playersTypeNum={}, maxLevel={}, size={})"
+        return res.format(self.players, self.playersTypesNum, self.maxLevel, self.size)
+
+
 class Team:
     def __init__(self, division=None) -> None:
         self.divisions = division if division is not None else []
-        self.playersTypesNum = {
-            playerType: 0 for playerType in list(PlayerType)
-        }
+        self.playersTypesNum = {playerType: 0 for playerType in list(PlayerType)}
         self.maxLevel = 0
         for division in self.divisions:
-            self.playersTypesNum[division.type] += 1
-            self.maxLevel = max(self.maxLevel, division.level)
+            for playerType in list(PlayerType):
+                self.playersTypesNum[playerType] += division.playersTypesNum[playerType]
+            self.maxLevel = max(self.maxLevel, division.maxLevel)
         self.size = len(self.divisions)
 
-    def addPlayer(self, player):
-        self.divisions.append(player)
-        self.playersTypesNum[player.type] += 1
-        self.size += 1
+    def addDivision(self, division):
+        self.divisions.append(division)
+        for playerType in list(PlayerType):
+            self.playersTypesNum[playerType] += division.playersTypesNum[playerType]
+        self.size += division.size
 
-    def removePlayer(self, player):
-        self.divisions.remove(player)
-        self.playersTypesNum[player.type] -= 1
-        self.size -= 1
+    def removeDivision(self, division):
+        self.divisions.remove(division)
+        for playerType in list(PlayerType):
+            self.playersTypesNum[playerType] -= division.playersTypesNum[playerType]
+        self.size -= division.size
 
     def copy(self):
         return Team(self.divisions.copy())

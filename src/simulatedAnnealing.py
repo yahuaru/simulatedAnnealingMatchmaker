@@ -24,11 +24,9 @@ class SimulatedAnnealingMatchmakerLogger:
     def logProb(self, iteration, prob):
         self.prob.append((iteration, prob))
 
-    def logPlayer(self, player):
-        pass
-
 
 class SimulatedAnnealingAction:
+
     def execute(self, queue, battle_group):
         pass
 
@@ -39,9 +37,10 @@ class SimulatedAnnealingAction:
         pass
 
 
-class AddPlayerAction(SimulatedAnnealingAction):
+class AddDivisionAction(SimulatedAnnealingAction):
+
     def __init__(self):
-        self.__added_player = None
+        self.__added_division = None
 
     def execute(self, queue, battle_group):
         if not queue:
@@ -49,74 +48,94 @@ class AddPlayerAction(SimulatedAnnealingAction):
         vacant_teams = [team for team in battle_group.teams if team.size < TEAM_SIZE]
         if not vacant_teams:
             return False
+
         vacant_team = random.choice(vacant_teams)
-        self.__added_player = queue.pop(0)
-        vacant_team.addPlayer(self.__added_player)
+        acceptable_division = None
+        for division in queue:
+            if division.size <= (TEAM_SIZE - vacant_team.size):
+                acceptable_division = division
+                break
+        if acceptable_division is None:
+            return False
+        self.__added_division = acceptable_division
+        queue.remove(self.__added_division)
+        vacant_team.addDivision(self.__added_division)
         return True
 
     def on_approved(self, queue):
-        self.__added_player = None
+        self.__added_division = None
 
     def on_rejected(self, queue):
-        queue.append(self.__added_player)
-        self.__added_player = None
+        queue.append(self.__added_division)
+        self.__added_division = None
 
 
-class RemovePlayerAction(SimulatedAnnealingAction):
+class RemoveDivisionAction(SimulatedAnnealingAction):
     def __init__(self):
-        self.__removed_player = None
+        self.__removed_division = None
 
     def execute(self, queue, battle_group):
-        teams_with_players = [team for team in battle_group.teams if team.size > 0]
-        if not teams_with_players:
+        not_empty_team = [team for team in battle_group.teams if team.size > 0]
+        if not not_empty_team:
             return False
 
-        team = random.choice(teams_with_players)
-        player = random.choice(team.divisions)
-        team.removePlayer(player)
-        self.__removed_player = player
+        team = random.choice(not_empty_team)
+        division = random.choice(team.divisions)
+        team.removeDivision(division)
+        self.__removed_division = division
         return True
 
     def on_approved(self, queue):
-        queue.append(self.__removed_player)
-        self.__removed_player = None
+        queue.append(self.__removed_division)
+        self.__removed_division = None
 
     def on_rejected(self, queue):
-        self.__removed_player = None
+        self.__removed_division = None
 
 
-class SwapPlayersAction(SimulatedAnnealingAction):
+class SwapDivisionsAction(SimulatedAnnealingAction):
     def execute(self, queue, battle_group):
         teams = list(battle_group.teams)
-        team_1 = random.choice(teams)
-        teams.remove(team_1)
-        team_2 = random.choice(teams)
+        team = random.choice(teams)
+        teams.remove(team)
+        other_team = random.choice(teams)
 
-        if team_1.size == 0 and team_2.size == 0:
+        if team.size == 0 and other_team.size == 0:
             return False
 
-        player_team_1 = None
-        if team_1.size != 0:
-            player_team_1 = random.choice(team_1.divisions)
-            team_1.removePlayer(player_team_1)
+        division = None
+        if team.size != 0:
+            division = random.choice(team.divisions)
 
-        player_team_2 = None
-        if team_2.size != 0:
-            player_team_2 = random.choice(team_2.divisions)
-            team_2.removePlayer(player_team_2)
+        other_division = None
+        if other_team.size != 0:
+            other_division = random.choice(other_team.divisions)
 
-        if player_team_2 is not None:
-            team_1.addPlayer(player_team_2)
+        if division is not None and other_division is not None:
+            if (division.size <= (other_division.size + TEAM_SIZE - other_team.size)
+                    and other_division.size <= (division.size + TEAM_SIZE - team.size)):
+                other_team.removeDivision(other_division)
+                team.removeDivision(division)
 
-        if player_team_1 is not None:
-            team_2.addPlayer(player_team_1)
+                other_team.addDivision(division)
+                team.addDivision(other_division)
+                return True
+        elif division is not None:
+            team.addDivision(division)
+            other_team.addDivision(division)
+            return True
+        elif other_division is not None and (TEAM_SIZE - team.size) <= other_division.size:
+            other_team.removeDivision(other_division)
+            team.addDivision(other_division)
+            return True
 
-        return True
+        return False
 
 
 class SimulatedAnnealingMatchmaker:
     def __init__(self, logger=None):
-        self.GENERATE_ACTIONS = [AddPlayerAction(), RemovePlayerAction(), SwapPlayersAction()]
+        self.__initial_temperature = 0
+        self.GENERATE_ACTIONS = [AddDivisionAction(), RemoveDivisionAction(), SwapDivisionsAction()]
 
         self.logger = logger
 
@@ -145,6 +164,7 @@ class SimulatedAnnealingMatchmaker:
         teams = [Team() for _ in range(TEAMS_NUM)]
         self.__current_battle_group = BattleGroup(teams)
         self.__prev_energy = self.__getEnergy(self.__current_battle_group)
+        self.__initial_temperature = self.__prev_energy
         self.__current_temperature = self.__prev_energy
         self.__current_iteration = 0
         self.__last_action = None
@@ -192,7 +212,7 @@ class SimulatedAnnealingMatchmaker:
         self.__current_iteration += 1
 
         if 1 < self.__current_iteration:
-            self.__current_temperature = 9 / math.log(1 + self.__current_iteration)
+            self.__current_temperature = self.__initial_temperature / math.log(1 + self.__current_iteration)
 
         return False, None
 
