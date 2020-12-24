@@ -182,7 +182,6 @@ class SimulatedAnnealingMatchmaker:
 
     def processBattleGroups(self) -> Tuple:
         current_candidate = self.__generateCandidate(self.__current_battle_group)
-        assert len(self.queue) + sum(team.size for team in current_candidate.teams) <= 9
         current_energy = self.__getEnergy(current_candidate)
 
         if self.logger:
