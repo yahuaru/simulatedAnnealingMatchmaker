@@ -3,10 +3,8 @@ import random
 from typing import Tuple
 
 from MatchmakerConditions import (SHIP_TYPE_DIFFERENCE, TEAM_SIZE, TEAMS_NUM,
-                                  BattleGroup, Team, MAX_LEVEL_DIFFERENCE)
+                                  BattleGroup, Team, MAX_LEVEL_DIFFERENCE, INITIAL_TEMPERATURE)
 from player import PlayerType
-
-TEMP_DECREASE_COEFFICIENT = 0.7
 
 
 class SimulatedAnnealingMatchmakerLogger:
@@ -136,7 +134,6 @@ class SwapDivisionsAction(SimulatedAnnealingAction):
 
 class SimulatedAnnealingMatchmaker:
     def __init__(self, logger=None):
-        self.__initial_temperature = 0
         self.GENERATE_ACTIONS = [AddDivisionAction(), RemoveDivisionAction(), SwapDivisionsAction()]
 
         self.logger = logger
@@ -166,8 +163,7 @@ class SimulatedAnnealingMatchmaker:
         teams = [Team() for _ in range(TEAMS_NUM)]
         self.__current_battle_group = BattleGroup(teams)
         self.__prev_energy = self.__getEnergy(self.__current_battle_group)
-        self.__initial_temperature = self.__prev_energy
-        self.__current_temperature = self.__prev_energy
+        self.__current_temperature = INITIAL_TEMPERATURE
         self.__current_iteration = 0
         self.__last_action = None
 
@@ -214,7 +210,7 @@ class SimulatedAnnealingMatchmaker:
         self.__current_iteration += 1
 
         if 1 < self.__current_iteration:
-            self.__current_temperature = self.__initial_temperature / math.log(1 + self.__current_iteration)
+            self.__current_temperature = INITIAL_TEMPERATURE / math.log(1 + self.__current_iteration)
 
         return False, None
 

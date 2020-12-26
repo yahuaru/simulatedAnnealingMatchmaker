@@ -1,5 +1,7 @@
 from player import PlayerType
 
+INITIAL_TEMPERATURE = 6
+
 SHIP_TYPE_DIFFERENCE = {
     PlayerType.ALPHA: 0,
     PlayerType.BETA: 0,
@@ -16,7 +18,7 @@ MAX_LEVEL_DIFFERENCE = 1
 
 MAX_PING_DIFFERENCE = 10
 
-TEAMS_NUM = 3
+TEAMS_NUM = 4
 
 TEAM_SIZE = 3
 
