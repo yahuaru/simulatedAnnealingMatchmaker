@@ -1,6 +1,6 @@
 import unittest  # The test framework
 
-from BattleGroup import Division
+from battleGroup import Division
 from player import Player, PlayerType
 from simulatedAnnealing import SimulatedAnnealingMatchmaker
 

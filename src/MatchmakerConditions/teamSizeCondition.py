@@ -1,4 +1,4 @@
-from MatchmakerConditions.Condition import Condition
+from MatchmakerConditions.condition import Condition
 
 
 class TeamSizeCondition(Condition):
@@ -7,7 +7,7 @@ class TeamSizeCondition(Condition):
         self.__team_size = params['team_size']
 
     def check(self, battle_group):
-        energy = 0
+        penalty = 0
         for i, team in enumerate(battle_group.teams[:-1]):
-            energy += (self.__team_size - team.size)
-        return energy
+            penalty += (self.__team_size - team.size)
+        return penalty

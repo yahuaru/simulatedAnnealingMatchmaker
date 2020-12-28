@@ -2,10 +2,10 @@ import math
 import random
 from typing import Tuple
 
-from BattleGroup import Team, BattleGroup
-from MatchmakerActions.AddDivisionAction import AddDivisionAction
-from MatchmakerActions.RemoveDivisionAction import RemoveDivisionAction
-from MatchmakerActions.SwapDivisionsAction import SwapDivisionsAction
+from battleGroup import Team, BattleGroup
+from MatchmakerActions.addDivisionAction import AddDivisionAction
+from MatchmakerActions.removeDivisionAction import RemoveDivisionAction
+from MatchmakerActions.swapDivisionsAction import SwapDivisionsAction
 from MatchmakerConditions import buildConditions
 
 

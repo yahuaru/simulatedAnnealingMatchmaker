@@ -1,5 +1,5 @@
-from MatchmakerConditions.PlayerTypeNumDifferenceCondition import PlayerTypeNumDifferenceCondition
-from MatchmakerConditions.TeamSizeCondition import TeamSizeCondition
+from MatchmakerConditions.playerTypeNumDifferenceCondition import PlayerTypeNumDifferenceCondition
+from MatchmakerConditions.teamSizeCondition import TeamSizeCondition
 
 PARAM_FIELD_TO_CONDITION = {
     'team_size': TeamSizeCondition,

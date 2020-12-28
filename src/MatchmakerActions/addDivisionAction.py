@@ -1,6 +1,6 @@
 import random
 
-from MatchmakerActions.Action import SimulatedAnnealingAction
+from MatchmakerActions.action import SimulatedAnnealingAction
 
 
 class AddDivisionAction(SimulatedAnnealingAction):
