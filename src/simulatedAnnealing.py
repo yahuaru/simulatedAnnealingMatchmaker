@@ -1,5 +1,6 @@
 import math
 import random
+from abc import ABC
 from typing import Tuple
 
 from battleGroup import Team, BattleGroup
@@ -9,44 +10,38 @@ from MatchmakerActions.swapDivisionsAction import SwapDivisionsAction
 from MatchmakerConditions import buildConditions
 
 
-class SimulatedAnnealingMatchmakerLogger:
+class SimulatedAnnealingMatchmakerLogger(ABC):
     def __init__(self):
-        self.iterations = []
-        self.prob = []
+        pass
 
     def cleanup(self):
-        self.iterations = []
-        self.prob = []
+        pass
 
-    def logIteration(self, iteration, temperature, energy):
-        self.iterations.append((iteration, temperature, energy))
-
-    def logProb(self, iteration, prob):
-        self.prob.append((iteration, prob))
+    def logIteration(self, iteration, temperature, energy, prob):
+        pass
 
 
 class SimulatedAnnealingMatchmaker:
     def __init__(self, params, logger=None):
-        self.GENERATE_ACTIONS = [AddDivisionAction(params), RemoveDivisionAction(params), SwapDivisionsAction(params)]
-
         self.logger = logger
 
         self.__teams_num = params['teams_num']
         self.__initial_temperature = params['initial_temperature']
 
-        self.__conditions = buildConditions(params)
+        self.__conditions, self.__available_actions = buildConditions(params)
+        self.__actions_instances = {action: action(params) for action in self.__available_actions}
 
         self.queue = []
         self.__current_battle_group = None
         self.__current_temperature = 0
         self.__prev_energy = 0
+        self.__prev_actions_weights = ()
         self.__current_iteration = 0
         self.__last_action = None
 
-        self.initProcess()
-
     def cleanup(self):
         self.queue.clear()
+        self.__prev_actions_weights = ()
         self.__current_battle_group = None
         self.__prev_energy = 0
         self.__current_temperature = 0
@@ -57,11 +52,22 @@ class SimulatedAnnealingMatchmaker:
     def currentIteration(self):
         return self.__current_iteration
 
-    def initProcess(self):
+    def startProcess(self):
         teams = [Team() for _ in range(self.__teams_num)]
         self.__current_battle_group = BattleGroup(teams)
-        self.__prev_energy = self.__getEnergy(self.__current_battle_group)
+        self.__prev_energy, self.__prev_actions_weights = self.__getEnergy(self.__current_battle_group)
         self.__current_temperature = self.__initial_temperature
+        self.__current_iteration = 0
+        self.__last_action = None
+
+    def stopProcess(self):
+        for team in self.__current_battle_group.teams:
+            for division in team.divisions:
+                self.queue.append(division)
+        self.__current_battle_group = None
+        self.__prev_energy = 0
+        self.__prev_actions_weights = ()
+        self.__current_temperature = 0
         self.__current_iteration = 0
         self.__last_action = None
 
@@ -76,34 +82,27 @@ class SimulatedAnnealingMatchmaker:
 
     def processBattleGroups(self) -> Tuple:
         current_candidate = self.__generateCandidate(self.__current_battle_group)
-        current_energy = self.__getEnergy(current_candidate)
-
-        if self.logger:
-            self.logger.logIteration(self.__current_iteration, self.__current_temperature, current_energy)
+        current_energy, current_actions_weights = self.__getEnergy(current_candidate)
 
         if current_energy == 0:
             self.__last_action.on_approved(self.queue)
             return True, current_candidate
 
+        probability = 1.0
         if current_energy > self.__prev_energy:
-            prob = math.exp(-(current_energy - self.__prev_energy) / self.__current_temperature)
+            probability = math.exp(-(current_energy - self.__prev_energy) / self.__current_temperature)
 
-            if self.logger:
-                self.logger.logProb(self.currentIteration, prob)
+        if self.logger is not None:
+            self.logger.logIteration(self.__current_iteration, self.__current_temperature, current_energy, probability)
 
-            if random.random() < prob:
-                self.__current_battle_group = current_candidate
-                self.__prev_energy = current_energy
-                self.__last_action.on_approved(self.queue)
-            else:
-                self.__last_action.on_rejected(self.queue)
-        else:
-            if self.logger:
-                self.logger.logProb(self.currentIteration, 1.0)
-
+        if probability >= 1.0 or random.random() < probability:
             self.__current_battle_group = current_candidate
             self.__prev_energy = current_energy
+            self.__prev_actions_weights = current_actions_weights
+
             self.__last_action.on_approved(self.queue)
+        else:
+            self.__last_action.on_rejected(self.queue)
 
         self.__current_iteration += 1
 
@@ -113,19 +112,40 @@ class SimulatedAnnealingMatchmaker:
         return False, None
 
     def __generateCandidate(self, battle_group) -> BattleGroup:
-        actions = list(self.GENERATE_ACTIONS)
         successful = False
-        action = None
         new_battle_group = None
+        actions_weights = list(self.__prev_actions_weights)
+        action_instance = None
         while not successful:
-            action = actions.pop(random.randint(0, len(actions) - 1))
+            max_weight = max(action_weight[1] for action_weight in actions_weights)
+            probability = random.random() * max_weight
+            current_action = None
+            for action_weight in actions_weights:
+                if probability < action_weight[1]:
+                    current_action = action_weight
+                    break
+
             new_battle_group = battle_group.copy()
-            successful = action.execute(self.queue, new_battle_group)
+            action_instance = self.__actions_instances[current_action[0]]
+            successful = action_instance.execute(self.queue, new_battle_group)
+            if not successful:
+                actions_weights.remove(current_action)
 
         if successful:
-            self.__last_action = action
+            self.__last_action = action_instance
 
         return new_battle_group
 
     def __getEnergy(self, battle_group):
-        return sum(condition.check(battle_group) for condition in self.__conditions)
+        actions_weights = {action: 0 for action in self.__available_actions}
+        total_penalty = 0
+        for condition in self.__conditions:
+            penalty = condition.check(battle_group)
+            total_penalty += penalty
+            for action in condition.ACTIONS:
+                actions_weights[action] += penalty
+
+        actions_weights = ((action, weight) for action, weight in actions_weights.items())
+        actions_weights = sorted(actions_weights, key=lambda v: v[1])
+
+        return total_penalty, actions_weights

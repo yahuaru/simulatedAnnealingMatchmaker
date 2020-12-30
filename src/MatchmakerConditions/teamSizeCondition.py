@@ -1,7 +1,10 @@
+from MatchmakerActions.addDivisionAction import AddDivisionAction
 from MatchmakerConditions.condition import Condition
 
 
 class TeamSizeCondition(Condition):
+    ACTIONS = (AddDivisionAction, )
+
     def __init__(self, params):
         super().__init__(params)
         self.__team_size = params['team_size']
