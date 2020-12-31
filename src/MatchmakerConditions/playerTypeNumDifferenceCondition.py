@@ -24,9 +24,7 @@ class PlayerTypeNumDifferenceCondition(Condition):
                         delta_ship_type = abs(type_num - other_type_num)
                         if delta_ship_type > self.__player_type_num_diff[playerType]:
                             penalty += 1
-                            break
-
             else:
-                penalty += (self.__teams_num - i - 1)
+                penalty += (self.__teams_num - i - 1) * len(list(PlayerType))
 
         return penalty
