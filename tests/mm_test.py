@@ -18,7 +18,7 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
             'initial_temperature': 3
         }
         self.mm = SimulatedAnnealingMatchmaker(self.params)
-        self.mm.startProcess()
+        self.mm.initProcess()
 
     def tearDown(self) -> None:
         self.mm.cleanup()
