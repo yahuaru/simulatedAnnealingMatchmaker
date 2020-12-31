@@ -9,9 +9,9 @@ PARAM_FIELD_TO_CONDITION = {
 
 def buildConditions(params):
     conditions = []
+    actions = set()
     for field in params:
         if field in PARAM_FIELD_TO_CONDITION:
             conditions.append(PARAM_FIELD_TO_CONDITION[field](params))
-    return conditions
-
-
+            actions.update(PARAM_FIELD_TO_CONDITION[field].ACTIONS)
+    return conditions, actions

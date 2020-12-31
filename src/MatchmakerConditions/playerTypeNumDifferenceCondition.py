@@ -1,8 +1,13 @@
+from MatchmakerActions.addDivisionAction import AddDivisionAction
+from MatchmakerActions.removeDivisionAction import RemoveDivisionAction
+from MatchmakerActions.swapDivisionsAction import SwapDivisionsAction
 from MatchmakerConditions.condition import Condition
 from player import PlayerType
 
 
 class PlayerTypeNumDifferenceCondition(Condition):
+    ACTIONS = (AddDivisionAction, SwapDivisionsAction, RemoveDivisionAction)
+
     def __init__(self, params):
         super().__init__(params)
         self.__player_type_num_diff = params['player_type_num_diff']

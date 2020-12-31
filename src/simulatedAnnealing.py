@@ -1,54 +1,44 @@
 import math
 import random
+from abc import ABC
 from typing import Tuple
 
 from battleGroup import Team, BattleGroup
-from MatchmakerActions.addDivisionAction import AddDivisionAction
-from MatchmakerActions.removeDivisionAction import RemoveDivisionAction
-from MatchmakerActions.swapDivisionsAction import SwapDivisionsAction
 from MatchmakerConditions import buildConditions
 
 
-class SimulatedAnnealingMatchmakerLogger:
-    def __init__(self):
-        self.iterations = []
-        self.prob = []
-
+class SimulatedAnnealingMatchmakerLogger(ABC):
     def cleanup(self):
-        self.iterations = []
-        self.prob = []
+        pass
 
-    def logIteration(self, iteration, temperature, energy):
-        self.iterations.append((iteration, temperature, energy))
+    def logIteration(self, iteration, temperature, energy, probability):
+        pass
 
     def logProb(self, iteration, prob):
-        self.prob.append((iteration, prob))
+        pass
 
 
 class SimulatedAnnealingMatchmaker:
     def __init__(self, params, logger=None):
-        self.GENERATE_ACTIONS = [AddDivisionAction(params), RemoveDivisionAction(params), SwapDivisionsAction(params)]
-
         self.logger = logger
 
         self.__teams_num = params['teams_num']
         self.__initial_temperature = params['initial_temperature']
 
-        self.__conditions = buildConditions(params)
+        self.__conditions, actions = buildConditions(params)
+        self.__actions = [action(params) for action in actions]
 
         self.queue = []
         self.__current_battle_group = None
         self.__current_temperature = 0
-        self.__prev_energy = 0
+        self.__prev_penalty = 0
         self.__current_iteration = 0
         self.__last_action = None
-
-        self.initProcess()
 
     def cleanup(self):
         self.queue.clear()
         self.__current_battle_group = None
-        self.__prev_energy = 0
+        self.__prev_penalty = 0
         self.__current_temperature = 0
         self.__current_iteration = 0
         self.__last_action = None
@@ -57,11 +47,21 @@ class SimulatedAnnealingMatchmaker:
     def currentIteration(self):
         return self.__current_iteration
 
-    def initProcess(self):
+    def startProcess(self):
         teams = [Team() for _ in range(self.__teams_num)]
         self.__current_battle_group = BattleGroup(teams)
-        self.__prev_energy = self.__getEnergy(self.__current_battle_group)
+        self.__prev_penalty = self.__getPenalty(self.__current_battle_group)
         self.__current_temperature = self.__initial_temperature
+        self.__current_iteration = 0
+        self.__last_action = None
+
+    def stopProcess(self):
+        for team in self.__current_battle_group:
+            for division in team.divisions:
+                self.queue.append(division)
+        self.__current_battle_group = None
+        self.__prev_penalty = 0
+        self.__current_temperature = 0
         self.__current_iteration = 0
         self.__last_action = None
 
@@ -76,33 +76,31 @@ class SimulatedAnnealingMatchmaker:
 
     def processBattleGroups(self) -> Tuple:
         current_candidate = self.__generateCandidate(self.__current_battle_group)
-        current_energy = self.__getEnergy(current_candidate)
+        current_penalty = self.__getPenalty(current_candidate)
 
-        if self.logger:
-            self.logger.logIteration(self.__current_iteration, self.__current_temperature, current_energy)
-
-        if current_energy == 0:
+        if current_penalty == 0:
             self.__last_action.on_approved(self.queue)
             return True, current_candidate
 
-        if current_energy > self.__prev_energy:
-            prob = math.exp(-(current_energy - self.__prev_energy) / self.__current_temperature)
+        if current_penalty > self.__prev_penalty:
+            probability = math.exp(-(current_penalty - self.__prev_penalty) / self.__current_temperature)
 
             if self.logger:
-                self.logger.logProb(self.currentIteration, prob)
+                self.logger.logIteration(self.__current_iteration, self.__current_temperature, current_penalty,
+                                         probability)
 
-            if random.random() < prob:
+            if random.random() < probability:
                 self.__current_battle_group = current_candidate
-                self.__prev_energy = current_energy
+                self.__prev_penalty = current_penalty
                 self.__last_action.on_approved(self.queue)
             else:
                 self.__last_action.on_rejected(self.queue)
         else:
             if self.logger:
-                self.logger.logProb(self.currentIteration, 1.0)
+                self.logger.logIteration(self.__current_iteration, self.__current_temperature, current_penalty, 1.0)
 
             self.__current_battle_group = current_candidate
-            self.__prev_energy = current_energy
+            self.__prev_penalty = current_penalty
             self.__last_action.on_approved(self.queue)
 
         self.__current_iteration += 1
@@ -113,7 +111,7 @@ class SimulatedAnnealingMatchmaker:
         return False, None
 
     def __generateCandidate(self, battle_group) -> BattleGroup:
-        actions = list(self.GENERATE_ACTIONS)
+        actions = list(self.__actions)
         successful = False
         action = None
         new_battle_group = None
@@ -127,5 +125,5 @@ class SimulatedAnnealingMatchmaker:
 
         return new_battle_group
 
-    def __getEnergy(self, battle_group):
+    def __getPenalty(self, battle_group):
         return sum(condition.check(battle_group) for condition in self.__conditions)
