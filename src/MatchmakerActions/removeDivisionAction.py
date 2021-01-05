@@ -20,7 +20,7 @@ class RemoveDivisionAction(SimulatedAnnealingAction):
         return True
 
     def on_approved(self, queue):
-        queue.append(self.__removed_division)
+        queue.pushDivision(self.__removed_division)
         self.__removed_division = None
 
     def on_rejected(self, queue):

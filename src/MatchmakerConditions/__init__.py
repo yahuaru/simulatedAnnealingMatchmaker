@@ -1,17 +1,19 @@
 from MatchmakerConditions.playerTypeNumDifferenceCondition import PlayerTypeNumDifferenceCondition
 from MatchmakerConditions.teamSizeCondition import TeamSizeCondition
 
-PARAM_FIELD_TO_CONDITION = {
-    'team_size': TeamSizeCondition,
-    'player_type_num_diff': PlayerTypeNumDifferenceCondition
-}
+CONDITIONS = (TeamSizeCondition, PlayerTypeNumDifferenceCondition)
 
 
 def buildConditions(params):
     conditions = []
-    actions = set()
-    for field in params:
-        if field in PARAM_FIELD_TO_CONDITION:
-            conditions.append(PARAM_FIELD_TO_CONDITION[field](params))
-            actions.update(PARAM_FIELD_TO_CONDITION[field].ACTIONS)
+    actions_classes = set()
+    param_fields = set(params.keys())
+    for condition in CONDITIONS:
+        if condition.REQUIRED_PARAMS.issubset(param_fields):
+            conditions.append(condition(params))
+            actions_classes = actions_classes | condition.ACTIONS
+
+    actions = []
+    for action_class in actions_classes:
+        actions.append(action_class(params))
     return conditions, actions

@@ -2,7 +2,8 @@ from abc import ABC
 
 
 class Condition(ABC):
-    ACTIONS = ()
+    ACTIONS = set()
+    REQUIRED_PARAMS = set()
 
     def __init__(self, params):
         pass
