@@ -7,7 +7,7 @@ from player import PlayerType
 
 class PlayerTypeNumDifferenceCondition(Condition):
     ACTIONS = {AddDivisionAction, SwapDivisionsAction, RemoveDivisionAction}
-    REQUIRED_PARAMS = {"player_type_num_diff", "teams_num"}
+    REQUIRED_PARAMS = {"player_type_num_diff", "teams_num", "max_team_size"}
 
     def __init__(self, params):
         super().__init__(params)

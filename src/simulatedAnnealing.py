@@ -22,23 +22,23 @@ class SimulatedAnnealingMatchmakerLogger(ABC):
         pass
 
 
-SimulatedAnnealingState = namedtuple("SimulatedAnnealingState", ["temperature", "conditions", "actions"])
+ParamsState = namedtuple("SimulatedAnnealingParamsState", ["temperature", "conditions", "actions"])
+QueueEntry = namedtuple("SimulatedAnnealingMatchmakerQueueEntry", ["enqueue_time", "id", "division"])
 
 
 class SimulatedAnnealingMatchmakerQueue:
     def __init__(self, queue=None):
         self.__queue = []
         if queue is not None:
-            self.__queue = sorted(queue)
+            self.__queue = sorted([QueueEntry(division.enqueue_time, division.id, division) for division in queue])
 
     def pushDivision(self, division):
-        bisect.insort(self.__queue, (division.enqueue_time, division.id, division))
+        entry = QueueEntry(division.enqueue_time, division.id, division)
+        self.__queue.append(entry)
 
     def removeDivision(self, division):
-        entry = (division.enqueue_time, division.id, division)
-        i = bisect.bisect_left(self.__queue, entry)
-        if self.__queue[i] == entry:
-            del self.__queue[i]
+        entry = QueueEntry(division.enqueue_time, division.id, division)
+        self.__queue.remove(entry)
 
     def removeByIndex(self, index):
         del self.__queue[index]
@@ -59,20 +59,20 @@ class SimulatedAnnealingMatchmaker:
 
         self.__queue = SimulatedAnnealingMatchmakerQueue(queue)
 
-        params_by_time = list(params.items())
-        params_by_time.sort(key=lambda param: param[0])
+
 
         self.__teams_num = params['teams_num']
 
         self.__param_state_by_time = {'time': [], 'states': []}
         common_params = copy.deepcopy(params)
-        params_by_time = common_params.pop('by_time')
-        for time, param in params_by_time.items():
+        params_by_time = list(common_params.pop('by_time').items())
+        params_by_time.sort(key=lambda param: param[0])
+        for time, param in params_by_time:
             self.__param_state_by_time['time'].append(time)
 
             param.update(common_params)
             conditions, actions = buildConditions(param)
-            state = SimulatedAnnealingState(param['initial_temperature'], conditions, actions)
+            state = ParamsState(param['initial_temperature'], conditions, actions)
             self.__param_state_by_time['states'].append(state)
 
         self.__current_battle_group = None
@@ -160,17 +160,9 @@ class SimulatedAnnealingMatchmaker:
         self.__current_battle_group = candidate
         self.__current_penalty = prev_penalty
         applied_action.on_approved(self.__queue)
-        total_sum = sum(team.size for team in self.__current_battle_group.teams) + sum(division.size for _, _, division in self.__queue)
-        assert total_sum == 9
-
 
     def __rejectCandidate(self, applied_action):
         applied_action.on_rejected(self.__queue)
-
-        total_sum = sum(team.size for team in self.__current_battle_group.teams) + sum(division.size for _, _, division in self.__queue)
-
-        assert total_sum == 9
-
 
     def __generateCandidate(self, battle_group, generate_actions) -> Tuple:
         actions = list(generate_actions)

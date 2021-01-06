@@ -18,10 +18,10 @@ class AddDivisionAction(SimulatedAnnealingAction):
             return False
 
         vacant_team = random.choice(vacant_teams)
-        for i, (_, _, division) in enumerate(queue):
-            if division.size <= (self.__max_team_size - vacant_team.size):
+        for i, entry in enumerate(queue):
+            if entry.division.size <= (self.__max_team_size - vacant_team.size):
                 self.__added_division_index = i
-                vacant_team.addDivision(division)
+                vacant_team.addDivision(entry.division)
                 return True
 
         return False
