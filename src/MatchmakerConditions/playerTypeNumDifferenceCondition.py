@@ -1,12 +1,13 @@
 from MatchmakerActions.addDivisionAction import AddDivisionAction
 from MatchmakerActions.removeDivisionAction import RemoveDivisionAction
 from MatchmakerActions.swapDivisionsAction import SwapDivisionsAction
+from MatchmakerActions.swapDivisionFromQueueAction import SwapDivisionsFromQueueAction
 from MatchmakerConditions.condition import Condition
 from player import PlayerType
 
 
 class PlayerTypeNumDifferenceCondition(Condition):
-    ACTIONS = {AddDivisionAction, SwapDivisionsAction, RemoveDivisionAction}
+    ACTIONS = {AddDivisionAction, SwapDivisionsAction, RemoveDivisionAction, SwapDivisionsFromQueueAction}
     REQUIRED_PARAMS = {"player_type_num_diff", "teams_num", "max_team_size"}
 
     def __init__(self, params):
