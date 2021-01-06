@@ -20,6 +20,12 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
                     },
                     'initial_temperature': 3
                 },
+                2: {
+                    'min_team_size': 2,
+                    'max_team_size': 3,
+                    'team_size_equal': False,
+                    'initial_temperature': 3
+                },
             }
         }
         self.mm = SimulatedAnnealingMatchmaker(self.params)
@@ -108,6 +114,84 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
                     delta_type = abs(other_type_num - type_num)
                     max_type_diff = self.params['by_time'][0]['player_type_num_diff'][playerType]
                     self.assertLessEqual(delta_type, max_type_diff)
+
+    def test_waitTimeRules(self):
+        index = 0
+        for i in range(3):
+            player = Player(PlayerType.ALPHA, 0, 0)
+            index += 1
+            division = Division(index)
+            division.addPlayer(player)
+            self.mm.enqueueDivision(division)
+
+        for i in range(3):
+            player = Player(PlayerType.BETA, 0, 0)
+            index += 1
+            division = Division(index)
+            division.addPlayer(player)
+            self.mm.enqueueDivision(division)
+
+        for i in range(3):
+            player = Player(PlayerType.GAMMA, 0, 0)
+            index += 1
+            division = Division(index)
+            division.addPlayer(player)
+            self.mm.enqueueDivision(division)
+
+        for i in range(3):
+            player = Player(PlayerType.ALPHA, 0, 0)
+            index += 1
+            division = Division(index)
+            division.addPlayer(player)
+            self.mm.enqueueDivision(division)
+
+        for i in range(3):
+            player = Player(PlayerType.BETA, 0, 0)
+            index += 1
+            division = Division(index)
+            division.addPlayer(player)
+            self.mm.enqueueDivision(division)
+
+        successful = False
+        bg = None
+        self.mm.startProcess()
+        while not successful:
+            successful, bg = self.mm.processBattleGroups(0)
+
+        self.assertTrue(successful)
+        self.assertIsNotNone(bg)
+
+        self.assertEqual(len(self.mm._SimulatedAnnealingMatchmaker__queue), 6)
+
+        self.assertEqual(len(bg.teams), self.params['teams_num'])
+
+        for team in bg.teams:
+            self.assertEqual(team.size, self.params['by_time'][0]['max_team_size'])
+        for i, team in enumerate(bg.teams):
+            for otherTeam in bg.teams[i:]:
+                for playerType in list(PlayerType):
+                    type_num = team.players_types_num[playerType]
+                    other_type_num = otherTeam.players_types_num[playerType]
+                    delta_type = abs(other_type_num - type_num)
+                    max_type_diff = self.params['by_time'][0]['player_type_num_diff'][playerType]
+                    self.assertLessEqual(delta_type, max_type_diff)
+
+        successful = False
+        bg = None
+        self.mm.startProcess()
+        while not successful:
+            successful, bg = self.mm.processBattleGroups(2)
+
+        self.assertTrue(successful)
+        self.assertIsNotNone(bg)
+
+        self.assertEqual(len(self.mm._SimulatedAnnealingMatchmaker__queue), 0)
+
+        self.assertEqual(len(bg.teams), self.params['teams_num'])
+
+        for team in bg.teams:
+            self.assertLessEqual(team.size, self.params['by_time'][2]['max_team_size'])
+            self.assertGreaterEqual(team.size, self.params['by_time'][2]['min_team_size'])
 
 
 if __name__ == '__main__':
