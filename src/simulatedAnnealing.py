@@ -6,69 +6,64 @@ from MatchmakerConditions import buildConditions
 from simulatedAnnealingQueue import SimulatedAnnealingMatchmakerQueue
 from simulatedAnnealingThread import SimulatedAnnealingMatchmakerThread
 
-THREADS_NUM = 1
 
-
-ParamsState = namedtuple("SimulatedAnnealingParamsState", ["temperature", "conditions", "actions"])
+ParamsState = namedtuple("SimulatedAnnealingParamsState", ["temperature", "conditions_param", "conditions", "actions"])
 
 
 class SimulatedAnnealingMatchmaker:
-    def __init__(self, params, on_battle_group_collected, queue=None):
+    def __init__(self, params, threads_num, on_battle_group_collected, queue=None):
         self.__queue = SimulatedAnnealingMatchmakerQueue(queue)
 
+        self.__threads_num = threads_num
         self.__on_battle_group_collected = on_battle_group_collected
 
-        self.__teams_num = params['teams_num']
+        self.__teams_num = params['common_conditions']['teams_num']
 
         self.__is_processing = False
 
         self.__param_state_by_time = {'time': [], 'states': []}
-        common_params = copy.deepcopy(params)
-        params_by_time = list(common_params.pop('by_time').items())
+        common_conditions_params = params['common_conditions']
+        params_by_time = list(params['by_time'].items())
         params_by_time.sort(key=lambda param: param[0])
         for param_time, param in params_by_time:
             self.__param_state_by_time['time'].append(param_time)
 
-            param.update(common_params)
-            conditions, actions = buildConditions(param)
-            state = ParamsState(param['initial_temperature'], conditions, actions)
+            conditions_param = param['conditions'].copy()
+            conditions_param.update(common_conditions_params)
+            conditions, actions_classes = buildConditions(conditions_param)
+            state = ParamsState(param['initial_temperature'], conditions_param, conditions, actions_classes)
             self.__param_state_by_time['states'].append(state)
 
         self.__threads = []
-        for i in range(THREADS_NUM):
-            thread = SimulatedAnnealingMatchmakerThread(self.__queue, self.__param_state_by_time, self.__onThreadFinished)
-            self.__threads.append(thread)
 
     def __onThreadFinished(self, thread, is_successful, battle_group):
-        if not is_successful:
-            if self.__is_processing:
-                current_time = time.time()
-                thread.prepareProcessing(current_time)
-            else:
-                thread.stopProcessing()
-        else:
+        if is_successful:
             self.__on_battle_group_collected(battle_group)
+        self.__threads.remove(thread)
 
     def clear(self):
+        self.stopProcess()
+
         self.__queue.clear()
         self.__param_state_by_time.clear()
 
     def startProcess(self):
-        self.__is_processing = True
-        for thread in self.__threads:
-            thread.prepareProcessing(self.__teams_num)
-            thread.start()
+        for i in range(len(self.__threads), self.__threads_num):
+            thread = SimulatedAnnealingMatchmakerThread(self.__queue, self.__param_state_by_time, self.__onThreadFinished)
+            self.__threads.append(thread)
+
+            thread.startProcessing(self.__teams_num)
 
     def waitForCompletion(self):
         for thread in self.__threads:
-            if thread.is_active:
+            if thread.is_alive():
                 thread.join()
 
     def stopProcess(self):
-        self.__is_processing = False
         for thread in self.__threads:
-            thread.stopProcessing()
-            thread.join()
+            if thread.is_alive():
+                thread.stopProcessing()
+                thread.join()
 
     def enqueueDivision(self, division):
         self.__queue.pushDivision(division)

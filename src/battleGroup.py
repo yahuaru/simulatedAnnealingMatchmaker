@@ -2,7 +2,7 @@ from player import PlayerType
 
 
 class Division:
-    def __init__(self, division_id, players=None, enqueue_time=0):
+    def __init__(self, division_id, players=None, enqueue_time=0.0):
         self.id = division_id
         self.players = players if players is not None else []
         self.size = len(self.players)

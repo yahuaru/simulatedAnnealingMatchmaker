@@ -13,7 +13,4 @@ def buildConditions(params):
             conditions.append(condition(params))
             actions_classes = actions_classes | condition.ACTIONS
 
-    actions = []
-    for action_class in actions_classes:
-        actions.append(action_class(params))
-    return conditions, actions
+    return conditions, actions_classes

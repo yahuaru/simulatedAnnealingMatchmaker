@@ -33,6 +33,7 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
 
     def tearDown(self) -> None:
         self.mm.clear()
+        self.result_battle_group = None
 
     # T: D(ALPHA), D(BETA), D(GAMMA)
     # T: D(ALPHA), D(BETA), D(GAMMA)
