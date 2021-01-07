@@ -91,7 +91,6 @@ class SimulatedAnnealingMatchmakerThread(Thread):
                 current_temperature = candidate_param.temperature / math.log(1 + self.__current_iteration)
 
             probability = math.exp(-(candidate_penalty - self.__current_penalty) / current_temperature)
-
             if random.random() < probability:
                 self.__acceptCandidate(candidate, candidate_penalty, applied_action)
             else:
