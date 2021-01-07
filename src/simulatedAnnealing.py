@@ -100,7 +100,7 @@ class SimulatedAnnealingMatchmaker:
         self.__current_iteration = 0
 
     def stopProcess(self):
-        for team in self.__current_battle_group:
+        for team in self.__current_battle_group.teams:
             for division in team.divisions:
                 self.__queue.pushDivision(division)
         self.__current_battle_group = None
