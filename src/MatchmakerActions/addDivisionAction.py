@@ -7,7 +7,7 @@ class AddDivisionAction(SimulatedAnnealingAction):
     def __init__(self, params):
         super().__init__(params)
         self.__max_team_size = params['max_team_size']
-        self.__added_division_index = -1
+        self.__added_division = None
 
     def execute(self, queue, battle_group):
         if not queue:
@@ -18,18 +18,18 @@ class AddDivisionAction(SimulatedAnnealingAction):
             return False
 
         vacant_team = random.choice(vacant_teams)
-        for i, entry in enumerate(queue):
-            if entry.division.size <= (self.__max_team_size - vacant_team.size):
-                self.__added_division_index = i
-                vacant_team.addDivision(entry.division)
-                return True
+        division_from_queue = queue.popDivisionBySize(self.__max_team_size - vacant_team.size)
+        if division_from_queue is None:
+            return False
 
-        return False
+        self.__added_division = division_from_queue
+        vacant_team.addDivision(division_from_queue)
+        return True
 
     def on_approved(self, queue):
-        queue.removeByIndex(self.__added_division_index)
-        self.__added_division_index = -1
+        self.__added_division = None
 
     def on_rejected(self, queue):
-        self.__added_division_index = -1
+        queue.pushDivision(self.__added_division)
+        self.__added_division = None
 

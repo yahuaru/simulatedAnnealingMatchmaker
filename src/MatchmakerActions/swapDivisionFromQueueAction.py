@@ -7,7 +7,7 @@ class SwapDivisionsFromQueueAction(SimulatedAnnealingAction):
     def __init__(self, params):
         super().__init__(params)
         self.__max_team_size = params['max_team_size']
-        self.__added_division_index = -1
+        self.__added_division = None
         self.__removed_division = None
 
     def execute(self, queue, battle_group):
@@ -22,22 +22,22 @@ class SwapDivisionsFromQueueAction(SimulatedAnnealingAction):
         division = random.choice(team.divisions)
 
         free_space = self.__max_team_size - team.size
-        for i, entry in enumerate(queue):
-            if entry.division.size <= (division.size + free_space):
-                team.removeDivision(division)
-                self.__removed_division = division
-                team.addDivision(entry.division)
-                self.__added_division_index = i
-                return True
+        division_from_queue = queue.popDivisionBySize(division.size + free_space)
+        if division_from_queue is None:
+            return False
 
-        return False
+        team.removeDivision(division)
+        self.__removed_division = division
+        team.addDivision(division_from_queue)
+        self.__added_division = division_from_queue
+        return True
 
     def on_approved(self, queue):
-        queue.removeByIndex(self.__added_division_index)
         queue.pushDivision(self.__removed_division)
-        self.__added_division_index = -1
+        self.__added_division = None
         self.__removed_division = None
 
     def on_rejected(self, queue):
-        self.__added_division_index = -1
+        queue.pushDivision(self.__added_division)
+        self.__added_division = None
         self.__removed_division = None
