@@ -10,14 +10,14 @@ class Division:
         self.maxLevel = 0
         for player in self.players:
             self.players_types_num[player.type] += 1
-            self.maxLevel = max(self.maxLevel, player.level)
+            # self.maxLevel = max(self.maxLevel, player.level)
         self.enqueue_time = enqueue_time
 
     def addPlayer(self, player):
         self.size += 1
         self.players.append(player)
         self.players_types_num[player.type] += 1
-        self.maxLevel = max(self.maxLevel, player.level)
+        # self.maxLevel = max(self.maxLevel, player.level)
 
     def __repr__(self):
         res = "Division(players={}, playersTypeNum={}, maxLevel={}, size={})"

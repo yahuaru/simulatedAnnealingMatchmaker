@@ -2,23 +2,15 @@ import random
 import time
 import unittest
 
-from battleGroup import Division
 from player import PlayerType, Player
 from simulatedAnnealing import SimulatedAnnealingMatchmaker
 from simulatedAnnealingQueue import QueueEntry
+from tests.helper_functions import generateDivision
 
 MAX_DIVISION_SIZE = 3
 TEAMS_NUM = 4
 
 THREADS_NUM = 2
-
-
-def generateDivision(index, max_division_size, enqueue_time=0.0):
-    division = Division(index, enqueue_time=enqueue_time)
-    for i in range(random.randint(1, max_division_size)):
-        player = Player(random.choice(list(PlayerType)), 0, 0)
-        division.addPlayer(player)
-    return division
 
 
 class Test_MultithreadingMatchmaker(unittest.TestCase):

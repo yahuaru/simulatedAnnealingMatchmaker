@@ -1,5 +1,6 @@
 import time
 import unittest  # The test framework
+from unittest.mock import patch
 
 from battleGroup import Division
 from player import Player, PlayerType
@@ -27,9 +28,9 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
                         'min_team_size': MAX_TEAM_SIZE,
                         'max_team_size': MAX_TEAM_SIZE,
                         'player_type_num_diff': {
-                            PlayerType.ALPHA: 2,
-                            PlayerType.BETA: 2,
-                            PlayerType.GAMMA: 2,
+                            PlayerType.ALPHA: 0,
+                            PlayerType.BETA: 0,
+                            PlayerType.GAMMA: 0,
                         },
                     },
                     'initial_temperature': 3
@@ -38,7 +39,12 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
                     'conditions': {
                         'min_team_size': MIN_TEAM_SIZE,
                         'max_team_size': MAX_TEAM_SIZE,
-                        'team_size_equal': False,
+                        'team_size_equal': True,
+                        'player_type_num_diff': {
+                            PlayerType.ALPHA: 0,
+                            PlayerType.BETA: 0,
+                            PlayerType.GAMMA: 0,
+                        },
                     },
                     'initial_temperature': 3,
                 },
@@ -57,45 +63,43 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
     # T: D(ALPHA), D(BETA), D(GAMMA)
     # T: D(ALPHA), D(BETA), D(GAMMA)
     # T: D(ALPHA), D(BETA), D(GAMMA)
-    def test_waitTimeConditions(self):
+    @patch("time.time", return_value=0)
+    def test_waitTimeConditions(self, time_patch):
         index = 0
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.ALPHA, 0, 0)
+            player = Player(PlayerType.ALPHA)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.BETA, 0, 0)
+            player = Player(PlayerType.BETA)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.GAMMA, 0, 0)
+            player = Player(PlayerType.GAMMA)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.ALPHA, 0, 0)
+            player = Player(PlayerType.ALPHA)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.BETA, 0, 0)
+            player = Player(PlayerType.BETA)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision(division)
-
-        for entry in self.mm._SimulatedAnnealingMatchmaker__queue:
-            entry.division.enqueue_time = time.time()
 
         self.mm.startProcess()
         self.mm.waitForCompletion()
@@ -123,8 +127,7 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
                     max_type_diff = self.params['by_time'][0]['conditions']['player_type_num_diff'][playerType]
                     self.assertLessEqual(delta_type, max_type_diff)
 
-        for entry in self.mm._SimulatedAnnealingMatchmaker__queue:
-            entry.division.enqueue_time = time.time() - SECOND_TRY_TIME
+        time_patch.return_value = SECOND_TRY_TIME
         self.mm.startProcess()
         self.mm.waitForCompletion()
 

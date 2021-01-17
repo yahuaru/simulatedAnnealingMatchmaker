@@ -53,21 +53,21 @@ class Test_CollectBattleGroup(unittest.TestCase):
     def test_processBattleGroup(self):
         index = 0
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.ALPHA, 0, 0)
+            player = Player(PlayerType.ALPHA)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.BETA, 0, 0)
+            player = Player(PlayerType.BETA)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.GAMMA, 0, 0)
+            player = Player(PlayerType.GAMMA)
             index += 1
             division = Division(index)
             division.addPlayer(player)
@@ -97,12 +97,12 @@ class Test_CollectBattleGroup(unittest.TestCase):
     # T: D(BETA, ALPHA), D(GAMMA)
     # T: D(ALPHA, BETA, GAMMA)
     def test_processDifferentSizeDivisionsBattleGroup(self):
-        self.mm.enqueueDivision(Division(0, [Player(PlayerType.GAMMA, 0, 0), Player(PlayerType.BETA, 0, 0)]))
-        self.mm.enqueueDivision(Division(1, [Player(PlayerType.ALPHA, 0, 0)]))
-        self.mm.enqueueDivision(Division(2, [Player(PlayerType.BETA, 0, 0), Player(PlayerType.ALPHA, 0, 0)]))
-        self.mm.enqueueDivision(Division(3, [Player(PlayerType.GAMMA, 0, 0)]))
-        self.mm.enqueueDivision(Division(4, [Player(PlayerType.ALPHA, 0, 0), Player(PlayerType.BETA, 0, 0),
-                                             Player(PlayerType.GAMMA, 0, 0)]))
+        self.mm.enqueueDivision(Division(0, [Player(PlayerType.GAMMA), Player(PlayerType.BETA)]))
+        self.mm.enqueueDivision(Division(1, [Player(PlayerType.ALPHA)]))
+        self.mm.enqueueDivision(Division(2, [Player(PlayerType.BETA), Player(PlayerType.ALPHA)]))
+        self.mm.enqueueDivision(Division(3, [Player(PlayerType.GAMMA)]))
+        self.mm.enqueueDivision(Division(4, [Player(PlayerType.ALPHA), Player(PlayerType.BETA),
+                                             Player(PlayerType.GAMMA)]))
 
         self.mm.startProcess()
         self.mm.waitForCompletion()

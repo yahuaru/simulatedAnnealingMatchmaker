@@ -28,7 +28,6 @@ class SimulatedAnnealingMatchmakerThread(Thread):
         self.__current_penalty = 0
         self.__current_iteration = 0
         self.__param_state_by_time = params_states
-        self.__start_time = 0
 
         self.__force_stop = False
 
@@ -41,16 +40,17 @@ class SimulatedAnnealingMatchmakerThread(Thread):
 
         self.__current_iteration = 0
 
-        self.__start_time = time.time()
         self.start()
 
     def run(self) -> None:
         result = ProcessResult.NOT_COLLECTED
         battle_group = None
-        process_time = time.time() - self.__start_time
+        start_time = time.time()
+        process_time = 0
         while result == ProcessResult.NOT_COLLECTED and not self.__force_stop and process_time < MAX_PROCESS_TIME:
-            result, battle_group = self.__processBattleGroups(time.time())
-            process_time = time.time() - self.__start_time
+            current_time = time.time()
+            result, battle_group = self.__processBattleGroups(current_time)
+            process_time = time.time() - start_time
 
         if result == ProcessResult.COLLECTED:
             self.__current_battle_group = None
