@@ -70,6 +70,7 @@ class Test_MultithreadingMatchmaker(unittest.TestCase):
         for i in range(1000):
             division = generateDivision(index, MAX_DIVISION_SIZE, enqueue_time=time.time())
             self.mm.enqueueDivision(division)
+            index += 1
 
         self.start_time = time.time()
         while not self.is_finished:

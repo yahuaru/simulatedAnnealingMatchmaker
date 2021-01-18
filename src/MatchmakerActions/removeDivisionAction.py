@@ -1,6 +1,7 @@
 import random
 
 from MatchmakerActions.action import SimulatedAnnealingAction
+from battleGroup import BattleGroup
 
 
 class RemoveDivisionAction(SimulatedAnnealingAction):
@@ -9,15 +10,17 @@ class RemoveDivisionAction(SimulatedAnnealingAction):
         self.__removed_division = None
 
     def execute(self, queue, battle_group):
-        not_empty_team = [team for team in battle_group.teams if team.size > 0]
+        not_empty_team = [(team_id, team) for team_id, team in enumerate(battle_group.teams) if team.size > 0]
         if not not_empty_team:
-            return False
+            return None
 
-        team = random.choice(not_empty_team)
+        team_id, team = random.choice(not_empty_team)
         division = random.choice(team.divisions)
-        team.removeDivision(division)
+
+        new_battle_group = BattleGroup.removeDivision(battle_group, team_id, division)
+
         self.__removed_division = division
-        return True
+        return new_battle_group
 
     def on_approved(self, queue):
         queue.pushDivision(self.__removed_division)

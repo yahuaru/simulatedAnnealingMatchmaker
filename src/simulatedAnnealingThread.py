@@ -112,19 +112,17 @@ class SimulatedAnnealingMatchmakerThread(Thread):
 
     def __generateCandidate(self, battle_group, params, generate_actions) -> Tuple:
         actions = list(generate_actions)
-        successful = False
         action = None
         new_battle_group = None
-        while not successful and actions:
+        while new_battle_group is None and actions:
             action_class = actions.pop(random.randint(0, len(actions) - 1))
             action = action_class(params)
-            new_battle_group = battle_group.copy()
-            successful = action.execute(self.__queue, new_battle_group)
+            new_battle_group = action.execute(self.__queue, battle_group)
 
-        if not successful:
+        if new_battle_group is None:
             return False, None, None
 
-        return successful, new_battle_group, action
+        return True, new_battle_group, action
 
     @staticmethod
     def __getPenalty(battle_group, penalty_conditions):
