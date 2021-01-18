@@ -1,3 +1,5 @@
+import bisect
+import random
 from collections import namedtuple
 from threading import RLock
 
@@ -24,7 +26,7 @@ class SimulatedAnnealingMatchmakerQueue:
     @_threadOperation
     def pushDivision(self, division):
         entry = QueueEntry(division.enqueue_time, division.id, division)
-        self.__queue.append(entry)
+        bisect.insort(self.__queue, entry)
 
     @_threadOperation
     def removeDivision(self, division):
@@ -36,8 +38,10 @@ class SimulatedAnnealingMatchmakerQueue:
         if not self.__queue:
             return None
 
+        random_start_pos = int(pow(0.2, 8*random.random()) * len(self.__queue))
+
         index = -1
-        for i, entry in enumerate(self.__queue):
+        for i, entry in enumerate(self.__queue[random_start_pos:], random_start_pos):
             if entry.division.size <= size:
                 index = i
                 break
