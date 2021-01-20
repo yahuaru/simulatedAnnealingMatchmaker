@@ -66,14 +66,17 @@ class SimulatedAnnealingMatchmakerThread(Thread):
         self.__force_stop = True
 
     def __processBattleGroups(self, current_time):
-        current_wait_time = current_time - self.__current_battle_group.min_enqueue_time
+        if self.__current_battle_group.isEmpty():
+            current_wait_time = 0
+        else:
+            current_wait_time = current_time - self.__current_battle_group.min_enqueue_time
         current_param_index = bisect.bisect(self.__param_state_by_time['time'], current_wait_time) - 1
         current_actions = self.__param_state_by_time['states'][current_param_index].actions
         current_conditions_param = self.__param_state_by_time['states'][current_param_index].conditions_param
 
-        successful, candidate, applied_action = self.__generateCandidate(self.__current_battle_group,
-                                                                         current_conditions_param, current_actions)
-        if not successful:
+        candidate, applied_action = self.__generateCandidate(self.__current_battle_group, current_conditions_param,
+                                                             current_actions)
+        if candidate is None:
             return ProcessResult.NO_ACTIONS, None
 
         current_candidate_wait_time = current_time - candidate.min_enqueue_time
@@ -119,10 +122,7 @@ class SimulatedAnnealingMatchmakerThread(Thread):
             action = action_class(params)
             new_battle_group = action.execute(self.__queue, battle_group)
 
-        if new_battle_group is None:
-            return False, None, None
-
-        return True, new_battle_group, action
+        return new_battle_group, action
 
     @staticmethod
     def __getPenalty(battle_group, penalty_conditions):

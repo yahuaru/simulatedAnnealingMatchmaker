@@ -1,5 +1,3 @@
-import copy
-
 from player import PlayerType
 
 
@@ -42,10 +40,7 @@ class Team:
         for playerType in list(PlayerType):
             self.players_types_num[playerType] += division.players_types_num[playerType]
         self.size += division.size
-        if self.divisions:
-            self.min_enqueue_time = min(self.min_enqueue_time, division.enqueue_time)
-        else:
-            self.min_enqueue_time = division.enqueue_time
+        self.min_enqueue_time = min(division.enqueue_time for division in self.divisions)
 
     def removeDivision(self, division):
         self.divisions.remove(division)
@@ -70,6 +65,9 @@ class Team:
 class BattleGroup:
     def __init__(self, teams=None) -> None:
         self.teams = teams if teams is not None else []
+
+    def isEmpty(self):
+        return not any(team.divisions for team in self.teams)
 
     def size(self):
         return len(self.teams)
