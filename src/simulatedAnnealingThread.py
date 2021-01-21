@@ -79,6 +79,9 @@ class SimulatedAnnealingMatchmakerThread(Thread):
         if candidate is None:
             return ProcessResult.NO_ACTIONS, None
 
+        if candidate.isEmpty():
+            return ProcessResult.NOT_COLLECTED, None
+
         current_candidate_wait_time = current_time - candidate.min_enqueue_time
         candidate_param_index = bisect.bisect(self.__param_state_by_time['time'], current_candidate_wait_time) - 1
         candidate_param = self.__param_state_by_time['states'][candidate_param_index]

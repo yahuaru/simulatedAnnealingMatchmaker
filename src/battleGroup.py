@@ -67,7 +67,7 @@ class BattleGroup:
         self.teams = teams if teams is not None else []
 
     def isEmpty(self):
-        return not any(team.divisions for team in self.teams)
+        return not any(team.size != 0 for team in self.teams)
 
     def size(self):
         return len(self.teams)
@@ -99,7 +99,7 @@ class BattleGroup:
 
     @property
     def min_enqueue_time(self):
-        return min(team.min_enqueue_time for team in self.teams) if self.teams else 0
+        return min(team.min_enqueue_time for team in self.teams if team.size != 0) if self.teams else 0
 
     def copy(self, teams_id_copy=None):
         battle_group = BattleGroup()
