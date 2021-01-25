@@ -7,21 +7,21 @@ class Division:
         self.players = players if players is not None else []
         self.size = len(self.players)
         self.players_types_num = {playerType: 0 for playerType in list(PlayerType)}
-        self.maxLevel = 0
+        self.max_level = 0
         for player in self.players:
             self.players_types_num[player.type] += 1
-            # self.maxLevel = max(self.maxLevel, player.level)
+            self.max_level = max(self.max_level, player.level)
         self.enqueue_time = enqueue_time
 
     def addPlayer(self, player):
         self.size += 1
         self.players.append(player)
         self.players_types_num[player.type] += 1
-        # self.maxLevel = max(self.maxLevel, player.level)
+        self.max_level = max(self.max_level, player.level)
 
     def __repr__(self):
         res = "Division(players={}, playersTypeNum={}, maxLevel={}, size={})"
-        return res.format(self.players, self.players_types_num, self.maxLevel, self.size)
+        return res.format(self.players, self.players_types_num, self.max_level, self.size)
 
 
 class Team:
@@ -30,10 +30,12 @@ class Team:
         self.players_types_num = {playerType: 0 for playerType in list(PlayerType)}
         self.size = 0
         self.min_enqueue_time = min(division.enqueue_time for division in self.divisions) if self.divisions else 0
+        self.max_level = 0
         for division in self.divisions:
             for playerType in list(PlayerType):
                 self.players_types_num[playerType] += division.players_types_num[playerType]
             self.size += division.size
+            self.max_level = max(self.max_level, division.max_level)
 
     def addDivision(self, division):
         self.divisions.append(division)
@@ -41,6 +43,7 @@ class Team:
             self.players_types_num[playerType] += division.players_types_num[playerType]
         self.size += division.size
         self.min_enqueue_time = min(division.enqueue_time for division in self.divisions)
+        self.max_level = max(self.max_level, division.max_level)
 
     def removeDivision(self, division):
         self.divisions.remove(division)
@@ -48,6 +51,7 @@ class Team:
             self.players_types_num[playerType] -= division.players_types_num[playerType]
         self.size -= division.size
         self.min_enqueue_time = min(d.enqueue_time for d in self.divisions) if self.divisions else 0
+        self.max_level = max(d.max_level for d in self.divisions) if self.divisions else 0
 
     def copy(self):
         team = Team()
@@ -55,6 +59,7 @@ class Team:
         team.players_types_num = self.players_types_num.copy()
         team.size = self.size
         team.min_enqueue_time = self.min_enqueue_time
+        team.max_level = self.max_level
         return team
 
     def __repr__(self) -> str:

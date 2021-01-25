@@ -1,7 +1,7 @@
 import bisect
 import random
 from collections import namedtuple
-from threading import RLock
+from threading import RLock, Semaphore
 
 QueueEntry = namedtuple("SimulatedAnnealingMatchmakerQueueEntry", ["enqueue_time", "id", "division"])
 
@@ -17,7 +17,7 @@ def _threadOperation(func):
 
 class SimulatedAnnealingMatchmakerQueue:
     def __init__(self, queue=None):
-        self._lock = RLock()
+        self._lock = Semaphore()
 
         self.__queue = []
         if queue is not None:

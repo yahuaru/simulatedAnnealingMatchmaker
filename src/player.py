@@ -8,4 +8,4 @@ class PlayerType(IntEnum):
     GAMMA = auto()
 
 
-Player = namedtuple("Player", ["type", ])
+Player = namedtuple("Player", ["type", "level"])
