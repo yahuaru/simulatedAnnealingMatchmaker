@@ -52,7 +52,7 @@ def test_get_next_available_queue(queue_manager):
     resulted_queues = [QueueGroupKey('test', (2,)), QueueGroupKey('test', (3,)), QueueGroupKey('test', (4,)),
                        QueueGroupKey('test', (5,)), QueueGroupKey('test', (6,)), QueueGroupKey('test', (7,))]
 
-    group_key = queue_manager.get_next_available_key()
+    group_key = queue_manager.get_next_available_group_key()
     while group_key:
         assert group_key in resulted_queues
         resulted_queues.remove(group_key)
@@ -66,4 +66,4 @@ def test_get_next_available_queue(queue_manager):
             assert abs(division.max_level - max_level) <= max_level_difference
             assert abs(division.max_level - min_level) <= max_level_difference
             division = queue_manager.pop(group_key, max_division_size)
-        group_key = queue_manager.get_next_available_key()
+        group_key = queue_manager.get_next_available_group_key()

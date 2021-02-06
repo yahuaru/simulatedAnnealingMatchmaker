@@ -91,11 +91,11 @@ class Test_CollectBattleGroup(unittest.TestCase):
     # T: D(BETA, ALPHA), D(GAMMA)
     # T: D(ALPHA, BETA, GAMMA)
     def test_processDifferentSizeDivisionsBattleGroup(self):
-        self.mm.enqueueDivision(Division(0, [Player(PlayerType.GAMMA, 0), Player(PlayerType.BETA, 0)]))
-        self.mm.enqueueDivision(Division(1, [Player(PlayerType.ALPHA, 0)]))
-        self.mm.enqueueDivision(Division(2, [Player(PlayerType.BETA, 0), Player(PlayerType.ALPHA, 0)]))
-        self.mm.enqueueDivision(Division(3, [Player(PlayerType.GAMMA, 0)]))
-        self.mm.enqueueDivision(Division(4, [Player(PlayerType.ALPHA, 0), Player(PlayerType.BETA, 0),
+        self.mm.enqueueDivision('test_battle_group', Division(0, [Player(PlayerType.GAMMA, 0), Player(PlayerType.BETA, 0)]))
+        self.mm.enqueueDivision('test_battle_group', Division(1, [Player(PlayerType.ALPHA, 0)]))
+        self.mm.enqueueDivision('test_battle_group', Division(2, [Player(PlayerType.BETA, 0), Player(PlayerType.ALPHA, 0)]))
+        self.mm.enqueueDivision('test_battle_group', Division(3, [Player(PlayerType.GAMMA, 0)]))
+        self.mm.enqueueDivision('test_battle_group', Division(4, [Player(PlayerType.ALPHA, 0), Player(PlayerType.BETA, 0),
                                              Player(PlayerType.GAMMA, 0)]))
 
         self.mm.startProcess()

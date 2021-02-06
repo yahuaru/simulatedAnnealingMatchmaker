@@ -54,7 +54,7 @@ class QueueManager(object):
         assert key in self._groups_queues, "Group key:{} not in queues:{}".format(key, self._groups_queues.keys())
         self._available_group_keys.append(key)
 
-    def get_next_available_key(self) -> Optional[QueueGroupKey]:
+    def get_next_available_group_key(self) -> Optional[QueueGroupKey]:
         if not self._available_group_keys:
             return None
         return self._available_group_keys.pop(0)

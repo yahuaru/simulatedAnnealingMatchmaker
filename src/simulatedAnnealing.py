@@ -1,40 +1,7 @@
-import bisect
-from collections import namedtuple
-
-from MatchmakerConditions import buildConditions
+from group_rules import BattleRules
 from matchmaker_queue.queue_manager import QueueManager
+from group_collector import GroupCollector
 from simulatedAnnealingThread import SimulatedAnnealingMatchmakerThread
-
-
-RuleState = namedtuple("SimulatedAnnealingParamsState", ["temperature", "conditions_param", "conditions", "actions"])
-
-
-class BattleRules(object):
-    def __init__(self, params):
-        common_conditions_params = params['common_conditions']
-        self._teams_num = common_conditions_params['teams_num']
-
-        self._time = []
-        self._states = []
-        # sort params by time for ease of bisecting
-        params_by_time = list(params['by_time'].items())
-        params_by_time.sort(key=lambda param: param[0])
-        for param_state_time, param in params_by_time:
-            self._time.append(param_state_time)
-
-            conditions_param = param['conditions'].copy()
-            conditions_param.update(common_conditions_params)
-            conditions, actions_classes = buildConditions(conditions_param)
-            state = RuleState(param['initial_temperature'], conditions_param, conditions, actions_classes)
-            self._states.append(state)
-
-    def get_state_by_time(self, state_time):
-        current_param_index = bisect.bisect(self._time, state_time) - 1
-        return self._states[current_param_index]
-
-    @property
-    def teams_num(self):
-        return self._teams_num
 
 
 class MatchmakerThreadBuilder(object):
@@ -43,9 +10,9 @@ class MatchmakerThreadBuilder(object):
         for battle_type, battle_type_params in params.items():
             self.__param_by_battle_type[battle_type] = BattleRules(params[battle_type])
 
-    def build_thread(self, available_queue, on_thread_finished):
-        thread_params = self.__param_by_battle_type[available_queue.battle_type]
-        return SimulatedAnnealingMatchmakerThread(available_queue, thread_params, on_thread_finished)
+    def build_thread(self, queue, group_key, on_thread_finished):
+        thread_params = self.__param_by_battle_type[group_key.battle_type]
+        return SimulatedAnnealingMatchmakerThread(queue, group_key, thread_params, on_thread_finished)
 
 
 class SimulatedAnnealingMatchmaker:
@@ -67,12 +34,12 @@ class SimulatedAnnealingMatchmaker:
 
     def startProcess(self):
         for i in range(len(self.__threads), self.__threads_num):
-            queue_entry = self.__queue_manager.get_next_available_queue()
-            if queue_entry is None:
+            group_key = self.__queue_manager.get_next_available_group_key()
+            if group_key is None:
                 break
-            thread = self.__thread_builder.build_thread(queue_entry, self.__on_thread_finished)
+            thread = self.__thread_builder.build_thread(self.__queue_manager, group_key, self.__on_thread_finished)
             self.__threads.append(thread)
-            thread.startProcessing()
+            thread.start()
 
     def waitForCompletion(self):
         for thread in self.__threads:
