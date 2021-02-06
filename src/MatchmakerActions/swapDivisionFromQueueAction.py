@@ -1,3 +1,4 @@
+import logging
 import random
 
 from MatchmakerActions.action import SimulatedAnnealingAction
@@ -23,7 +24,7 @@ class SwapDivisionsFromQueueAction(SimulatedAnnealingAction):
         division = random.choice(team.divisions)
 
         free_space = self.__max_team_size - team.size
-        division_from_queue = queue.popDivisionBySize(division.size + free_space)
+        division_from_queue = queue.pop(division.size + free_space)
         if division_from_queue is None:
             return None
 
@@ -35,11 +36,11 @@ class SwapDivisionsFromQueueAction(SimulatedAnnealingAction):
         return new_battle_group
 
     def on_approved(self, queue):
-        queue.pushDivision(self.__removed_division)
+        queue.enqueue(self.__removed_division)
         self.__added_division = None
         self.__removed_division = None
 
     def on_rejected(self, queue):
-        queue.pushDivision(self.__added_division)
+        queue.enqueue(self.__added_division)
         self.__added_division = None
         self.__removed_division = None

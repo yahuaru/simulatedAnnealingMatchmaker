@@ -62,7 +62,6 @@ class Test_MultithreadingMatchmaker(unittest.TestCase):
         self.result_battle_group = None
 
     def tearDown(self) -> None:
-        self.mm.clear()
         self.result_battle_group = None
 
     def test_processBattleGroup(self):

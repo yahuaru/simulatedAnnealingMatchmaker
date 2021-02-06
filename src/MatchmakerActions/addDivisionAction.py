@@ -19,7 +19,7 @@ class AddDivisionAction(SimulatedAnnealingAction):
             return None
 
         team_id, vacant_team = random.choice(vacant_teams)
-        division_from_queue = queue.popDivisionBySize(self.__max_team_size - vacant_team.size)
+        division_from_queue = queue.pop(self.__max_team_size - vacant_team.size)
         if division_from_queue is None:
             return None
 
@@ -32,6 +32,6 @@ class AddDivisionAction(SimulatedAnnealingAction):
         self.__added_division = None
 
     def on_rejected(self, queue):
-        queue.pushDivision(self.__added_division)
+        queue.enqueue(self.__added_division)
         self.__added_division = None
 

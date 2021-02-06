@@ -54,7 +54,6 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
         self.result_battle_group = None
 
     def tearDown(self) -> None:
-        self.mm.clear()
         self.result_battle_group = None
 
     def onResultBattleGroup(self, battle_group):
@@ -67,35 +66,35 @@ class Test_SimulatedAnnealingMatchmaker(unittest.TestCase):
     def test_waitTimeConditions(self, time_patch):
         index = 0
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.ALPHA)
+            player = Player(PlayerType.ALPHA, 0)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.BETA)
+            player = Player(PlayerType.BETA, 0)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.GAMMA)
+            player = Player(PlayerType.GAMMA, 0)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.ALPHA)
+            player = Player(PlayerType.ALPHA, 0)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision(division)
 
         for i in range(TEAMS_NUM):
-            player = Player(PlayerType.BETA)
+            player = Player(PlayerType.BETA, 0)
             index += 1
             division = Division(index)
             division.addPlayer(player)

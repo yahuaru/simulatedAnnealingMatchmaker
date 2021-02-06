@@ -23,7 +23,7 @@ class RemoveDivisionAction(SimulatedAnnealingAction):
         return new_battle_group
 
     def on_approved(self, queue):
-        queue.pushDivision(self.__removed_division)
+        queue.enqueue(self.__removed_division)
         self.__removed_division = None
 
     def on_rejected(self, queue):
