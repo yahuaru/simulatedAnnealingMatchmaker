@@ -1,8 +1,9 @@
 import pytest
 
 from battleGroup import Division
+from matchmaker_queue.key.queue_key_builder import QueueGroupKey
 from player import Player, PlayerType
-from queue_manager import QueueManager
+from matchmaker_queue.queue_manager import QueueManager
 
 params = {
     'test':
@@ -36,38 +37,33 @@ def test_queue_manager(queue_manager):
 
 
 def test_get_next_available_queue(queue_manager):
+    max_division_size = 3
     index = 0
     for level in range(1, 7):
         for i in range(10):
             division = Division(index)
-            for j in range(3):
+            for j in range(max_division_size):
                 player = Player(PlayerType.ALPHA, level)
                 division.addPlayer(player)
             index += 1
             queue_manager.enqueue('test', division)
 
     # check we have right queues
-    resulted_queues = [('test', 2), ('test', 3), ('test', 4), ('test', 5), ('test', 6), ('test', 7)]
+    resulted_queues = [QueueGroupKey('test', (2,)), QueueGroupKey('test', (3,)), QueueGroupKey('test', (4,)),
+                       QueueGroupKey('test', (5,)), QueueGroupKey('test', (6,)), QueueGroupKey('test', (7,))]
 
-    key_queue = queue_manager.get_next_available_queue()
-    while key_queue:
-        queue_manager_entry = key_queue
-        assert queue_manager_entry.key in resulted_queues
-        resulted_queues.remove(queue_manager_entry.key)
+    group_key = queue_manager.get_next_available_key()
+    while group_key:
+        assert group_key in resulted_queues
+        resulted_queues.remove(group_key)
 
-        queue = queue_manager_entry.queue
         # check that level difference satisfy rules
-        division = queue_manager_entry.queue.pop()
-        assert division is not None
-        min_level = division.max_level
-        max_level = division.max_level
-        max_level_difference = params['test']['common_conditions']['by_level']['max_level_difference']
-        while queue:
-            division = queue.pop()
-            assert division is not None
+        division = queue_manager.pop(group_key, max_division_size)
+        while division is not None:
+            min_level = division.max_level
+            max_level = division.max_level
+            max_level_difference = params['test']['common_conditions']['by_level']['max_level_difference']
             assert abs(division.max_level - max_level) <= max_level_difference
             assert abs(division.max_level - min_level) <= max_level_difference
-            max_level = max(division.max_level, max_level)
-            min_level = min(division.max_level, min_level)
-
-        key_queue = queue_manager.get_next_available_queue()
+            division = queue_manager.pop(group_key, max_division_size)
+        group_key = queue_manager.get_next_available_key()

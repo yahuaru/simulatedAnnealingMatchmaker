@@ -2,7 +2,7 @@ import bisect
 from collections import namedtuple
 
 from MatchmakerConditions import buildConditions
-from queue_manager import QueueManager
+from matchmaker_queue.queue_manager import QueueManager
 from simulatedAnnealingThread import SimulatedAnnealingMatchmakerThread
 
 
