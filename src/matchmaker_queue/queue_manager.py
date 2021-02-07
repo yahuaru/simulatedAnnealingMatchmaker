@@ -46,7 +46,7 @@ class QueueManager(object):
         group_queues = list(self._groups_queues[group_key].values())
         random.shuffle(group_queues)
         for queue in group_queues:
-            if queue:
+            if not queue.is_empty():
                 return queue.pop(division_size)
         return None
 

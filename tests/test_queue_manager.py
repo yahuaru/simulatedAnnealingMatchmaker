@@ -39,12 +39,14 @@ def test_queue_manager(queue_manager):
 def test_get_next_available_queue(queue_manager):
     max_division_size = 3
     index = 0
+    divisions = []
     for level in range(1, 7):
         for i in range(10):
             division = Division(index)
             for j in range(max_division_size):
                 player = Player(PlayerType.ALPHA, level)
                 division.addPlayer(player)
+            divisions.append(division)
             index += 1
             queue_manager.enqueue('test', division)
 
@@ -60,6 +62,7 @@ def test_get_next_available_queue(queue_manager):
         # check that level difference satisfy rules
         division = queue_manager.pop(group_key, max_division_size)
         while division is not None:
+            divisions.remove(division)
             min_level = division.max_level
             max_level = division.max_level
             max_level_difference = params['test']['common_conditions']['by_level']['max_level_difference']
@@ -67,3 +70,5 @@ def test_get_next_available_queue(queue_manager):
             assert abs(division.max_level - min_level) <= max_level_difference
             division = queue_manager.pop(group_key, max_division_size)
         group_key = queue_manager.get_next_available_group_key()
+
+    assert 0 == len(divisions)
