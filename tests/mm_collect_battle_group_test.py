@@ -4,8 +4,6 @@ from battleGroup import Division
 from player import Player, PlayerType
 from simple_matchmaker import SimpleMatchmaker
 
-THREADS_NUM = 1
-
 TEAMS_NUM = 3
 TEAM_SIZE = 3
 

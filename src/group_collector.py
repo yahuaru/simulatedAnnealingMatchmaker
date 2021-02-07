@@ -50,9 +50,9 @@ class GroupCollector:
         candidate, applied_action = self.__generateCandidate(self.__current_battle_group, current_conditions_param,
                                                              current_actions)
         if candidate is None:
-            return ProcessResult.NO_ACTIONS, None
+            return ProcessResult.NO_ACTIONS, None, self._group_key
         elif candidate.isEmpty():
-            return ProcessResult.NOT_COLLECTED, None
+            return ProcessResult.NOT_COLLECTED, None, self._group_key
 
         current_candidate_wait_time = current_time - candidate.min_enqueue_time
         candidate_rules = self.__params_states.get_state_by_time(current_candidate_wait_time)
@@ -60,7 +60,7 @@ class GroupCollector:
 
         if candidate_penalty == 0:
             self.__acceptCandidate(candidate, candidate_penalty, applied_action)
-            return ProcessResult.COLLECTED, candidate
+            return ProcessResult.COLLECTED, candidate, self._group_key
 
         if candidate_penalty > self.__current_penalty:
             current_temperature = candidate_rules.temperature
@@ -77,7 +77,7 @@ class GroupCollector:
 
         self.__current_iteration += 1
 
-        return ProcessResult.NOT_COLLECTED, None
+        return ProcessResult.NOT_COLLECTED, None, self._group_key
 
     def __acceptCandidate(self, candidate, prev_penalty, applied_action):
         logging.debug("action approved Action:{}".format(applied_action.__class__))

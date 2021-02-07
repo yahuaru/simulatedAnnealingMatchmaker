@@ -1,7 +1,7 @@
 from group_rules import BattleRules
 from matchmaker_queue.queue_manager import QueueManager
 from group_collector import GroupCollector, ProcessResult
-from time import time
+import time
 
 class MatchmakerThreadBuilder(object):
     def __init__(self, params):
@@ -25,12 +25,13 @@ class SimpleMatchmaker:
     def process(self):
         key = self.__queue_manager.get_next_available_group_key()
         collector = GroupCollector(self.__queue_manager, key, self.__param_by_battle_type[key.battle_type])
-        current_time = time()
-        result, group = collector.processBattleGroups(current_time)
+        current_time = time.time()
+        result, group, group_key = collector.processBattleGroups(current_time)
         while result == ProcessResult.NOT_COLLECTED:
-            result, group = collector.processBattleGroups(current_time)
-        if result == ProcessResult.NOT_COLLECTED:
+            result, group, group_key = collector.processBattleGroups(current_time)
+        if result == ProcessResult.NO_ACTIONS:
             collector.cleanup()
+        self.__queue_manager.push_key(group_key)
         return group
 
     def enqueueDivision(self, battle_type, division):
