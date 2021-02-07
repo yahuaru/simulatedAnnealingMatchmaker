@@ -26,12 +26,12 @@ class SimpleMatchmaker:
         key = self.__queue_manager.get_next_available_group_key()
         collector = GroupCollector(self.__queue_manager, key, self.__param_by_battle_type[key.battle_type])
         current_time = time.time()
-        result, group, group_key = collector.processBattleGroups(current_time)
+        result, group = collector.processBattleGroups(current_time)
         while result == ProcessResult.NOT_COLLECTED:
-            result, group, group_key = collector.processBattleGroups(current_time)
+            result, group = collector.processBattleGroups(current_time)
         if result == ProcessResult.NO_ACTIONS:
             collector.cleanup()
-        self.__queue_manager.push_key(group_key)
+        self.__queue_manager.push_key(key)
         return group
 
     def enqueueDivision(self, battle_type, division):
