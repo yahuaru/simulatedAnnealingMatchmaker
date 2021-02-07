@@ -2,7 +2,7 @@ import unittest  # The test framework
 
 from battleGroup import Division
 from player import Player, PlayerType
-from simulatedAnnealing import SimulatedAnnealingMatchmaker
+from simple_matchmaker import SimpleMatchmaker
 
 THREADS_NUM = 1
 
@@ -34,26 +34,21 @@ class Test_CollectBattleGroup(unittest.TestCase):
                 }
             }
         }
-        self.mm = SimulatedAnnealingMatchmaker(self.params, THREADS_NUM, self.onResultBattleGroup)
-        self.result_battle_group = None
-
-    def tearDown(self) -> None:
-        self.result_battle_group = None
-
-    def onResultBattleGroup(self, battle_group):
-        self.result_battle_group = battle_group
+        self.mm = SimpleMatchmaker(self.params)
 
     # T: D(ALPHA), D(BETA), D(GAMMA)
     # T: D(ALPHA), D(BETA), D(GAMMA)
     # T: D(ALPHA), D(BETA), D(GAMMA)
     def test_processBattleGroup(self):
         index = 0
+        divisions = []
         for i in range(TEAMS_NUM):
             player = Player(PlayerType.ALPHA, 0)
             index += 1
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision("test_battle_group", division)
+            divisions.append(division)
 
         for i in range(TEAMS_NUM):
             player = Player(PlayerType.BETA, 0)
@@ -61,6 +56,7 @@ class Test_CollectBattleGroup(unittest.TestCase):
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision("test_battle_group", division)
+            divisions.append(division)
 
         for i in range(TEAMS_NUM):
             player = Player(PlayerType.GAMMA, 0)
@@ -68,18 +64,20 @@ class Test_CollectBattleGroup(unittest.TestCase):
             division = Division(index)
             division.addPlayer(player)
             self.mm.enqueueDivision("test_battle_group", division)
+            divisions.append(division)
 
-        self.mm.startProcess()
-        self.mm.waitForCompletion()
+        battle_group = self.mm.process()
+        self.assertIsNotNone(battle_group)
 
-        self.assertIsNotNone(self.result_battle_group)
+        self.assertEqual(TEAMS_NUM, len(battle_group.teams))
 
-        self.assertEqual(TEAMS_NUM, len(self.result_battle_group.teams))
-
-        for team in self.result_battle_group.teams:
+        for team in battle_group.teams:
             self.assertEqual(TEAM_SIZE, team.size)
-        for i, team in enumerate(self.result_battle_group.teams):
-            for otherTeam in self.result_battle_group.teams[i:]:
+            for division in team.divisions:
+                assert division in divisions
+                divisions.remove(division)
+        for i, team in enumerate(battle_group.teams):
+            for otherTeam in battle_group.teams[i:]:
                 for playerType in list(PlayerType):
                     type_num = team.players_types_num[playerType]
                     other_type_num = otherTeam.players_types_num[playerType]
@@ -91,31 +89,34 @@ class Test_CollectBattleGroup(unittest.TestCase):
     # T: D(BETA, ALPHA), D(GAMMA)
     # T: D(ALPHA, BETA, GAMMA)
     def test_processDifferentSizeDivisionsBattleGroup(self):
-        self.mm.enqueueDivision('test_battle_group', Division(0, [Player(PlayerType.GAMMA, 0), Player(PlayerType.BETA, 0)]))
-        self.mm.enqueueDivision('test_battle_group', Division(1, [Player(PlayerType.ALPHA, 0)]))
-        self.mm.enqueueDivision('test_battle_group', Division(2, [Player(PlayerType.BETA, 0), Player(PlayerType.ALPHA, 0)]))
-        self.mm.enqueueDivision('test_battle_group', Division(3, [Player(PlayerType.GAMMA, 0)]))
-        self.mm.enqueueDivision('test_battle_group', Division(4, [Player(PlayerType.ALPHA, 0), Player(PlayerType.BETA, 0),
-                                             Player(PlayerType.GAMMA, 0)]))
+        divisions = [
+            Division(0, [Player(PlayerType.GAMMA, 0), Player(PlayerType.BETA, 0)]),
+            Division(1, [Player(PlayerType.ALPHA, 0)]),
+            Division(2, [Player(PlayerType.BETA, 0), Player(PlayerType.ALPHA, 0)]),
+            Division(3, [Player(PlayerType.GAMMA, 0)]),
+            Division(4, [Player(PlayerType.ALPHA, 0), Player(PlayerType.BETA, 0),
+                         Player(PlayerType.GAMMA, 0)]),
+        ]
+        for division in divisions:
+            self.mm.enqueueDivision('test_battle_group', division)
 
-        self.mm.startProcess()
-        self.mm.waitForCompletion()
+        battle_group = self.mm.process()
+        self.assertIsNotNone(battle_group)
 
-        self.assertIsNotNone(self.result_battle_group)
+        self.assertEqual(len(battle_group.teams), TEAMS_NUM)
 
-        self.assertEqual(len(self.mm._SimulatedAnnealingMatchmaker__queue), 0)
-
-        self.assertEqual(len(self.result_battle_group.teams), TEAMS_NUM)
-
-        for team in self.result_battle_group.teams:
+        for team in battle_group.teams:
             self.assertEqual(team.size, TEAM_SIZE)
-        for i, team in enumerate(self.result_battle_group.teams):
-            for otherTeam in self.result_battle_group.teams[i:]:
+            for division in team.divisions:
+                assert division in divisions
+                divisions.remove(division)
+        for i, team in enumerate(battle_group.teams):
+            for otherTeam in battle_group.teams[i:]:
                 for playerType in list(PlayerType):
                     type_num = team.players_types_num[playerType]
                     other_type_num = otherTeam.players_types_num[playerType]
                     delta_type = abs(other_type_num - type_num)
-                    max_type_diff = self.params['by_time'][0]['conditions']['player_type_num_diff'][playerType]
+                    max_type_diff = self.params['test_battle_group']['by_time'][0]['conditions']['player_type_num_diff'][playerType]
                     self.assertLessEqual(delta_type, max_type_diff)
 
 

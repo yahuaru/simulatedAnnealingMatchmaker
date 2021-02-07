@@ -1,12 +1,12 @@
-from MatchmakerActions.addDivisionAction import AddDivisionAction
-from MatchmakerActions.removeDivisionAction import RemoveDivisionAction
-from MatchmakerActions.swapDivisionFromQueueAction import SwapDivisionsFromQueueAction
-from MatchmakerActions.swapDivisionsAction import SwapDivisionsAction
+from MatchmakerActions.addDivisionAction import AddDivisionActionBase
+from MatchmakerActions.removeDivisionAction import RemoveDivisionActionBase
+from MatchmakerActions.swapDivisionFromQueueAction import SwapDivisionsFromQueueActionBase
+from MatchmakerActions.swapDivisionsAction import SwapDivisionsActionBase
 from MatchmakerConditions.condition import Condition
 
 
 class LevelDifferenceCondition(Condition):
-	ACTIONS = {AddDivisionAction, SwapDivisionsAction, RemoveDivisionAction, SwapDivisionsFromQueueAction}
+	ACTIONS = {AddDivisionActionBase, SwapDivisionsActionBase, RemoveDivisionActionBase, SwapDivisionsFromQueueActionBase}
 	REQUIRED_PARAMS = {"max_level_difference", }
 
 	def __init__(self, params):

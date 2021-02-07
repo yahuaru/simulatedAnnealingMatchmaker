@@ -1,16 +1,16 @@
 import random
 
-from MatchmakerActions.action import SimulatedAnnealingAction
+from MatchmakerActions.action import ActionBase
 from battleGroup import BattleGroup
 
 
-class AddDivisionAction(SimulatedAnnealingAction):
+class AddDivisionActionBase(ActionBase):
     def __init__(self, params):
         super().__init__(params)
         self.__max_team_size = params['max_team_size']
         self.__added_division = None
 
-    def execute(self, queue, battle_group):
+    def execute(self, queue, group_key, battle_group):
         if not queue:
             return None
 
@@ -19,7 +19,7 @@ class AddDivisionAction(SimulatedAnnealingAction):
             return None
 
         team_id, vacant_team = random.choice(vacant_teams)
-        division_from_queue = queue.pop(self.__max_team_size - vacant_team.size)
+        division_from_queue = queue.pop(group_key, self.__max_team_size - vacant_team.size)
         if division_from_queue is None:
             return None
 
@@ -28,10 +28,10 @@ class AddDivisionAction(SimulatedAnnealingAction):
 
         return new_battle_group
 
-    def on_approved(self, queue):
+    def on_approved(self, queue, group_key):
         self.__added_division = None
 
-    def on_rejected(self, queue):
-        queue.enqueue(self.__added_division)
+    def on_rejected(self, queue, group_key):
+        queue.enqueue(group_key.battle_type, self.__added_division)
         self.__added_division = None
 

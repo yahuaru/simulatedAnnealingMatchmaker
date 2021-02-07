@@ -1,15 +1,15 @@
 import random
 
-from MatchmakerActions.action import SimulatedAnnealingAction
+from MatchmakerActions.action import ActionBase
 from battleGroup import BattleGroup
 
 
-class SwapDivisionsAction(SimulatedAnnealingAction):
+class SwapDivisionsActionBase(ActionBase):
     def __init__(self, params):
         super().__init__(params)
         self.__max_team_size = params['max_team_size']
 
-    def execute(self, queue, battle_group):
+    def execute(self, queue, group_key, battle_group):
         teams = [(team_id, team) for team_id, team in enumerate(battle_group.teams)]
         team_entry = random.choice(teams)
         teams.remove(team_entry)

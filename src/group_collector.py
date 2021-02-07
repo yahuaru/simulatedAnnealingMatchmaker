@@ -7,6 +7,12 @@ from typing import Tuple
 from battleGroup import Team, BattleGroup
 
 
+class ProcessResult(IntEnum):
+    COLLECTED = auto()
+    NOT_COLLECTED = auto()
+    NO_ACTIONS = auto()
+
+
 class GroupCollector:
     def __init__(self, queue, group_key, params_states):
         self._group_key = group_key
@@ -74,14 +80,14 @@ class GroupCollector:
         return ProcessResult.NOT_COLLECTED, None
 
     def __acceptCandidate(self, candidate, prev_penalty, applied_action):
-        logging.debug("action approved Action:{} Thread:{}".format(applied_action.__class__, threading.get_ident()))
+        logging.debug("action approved Action:{}".format(applied_action.__class__))
         self.__current_battle_group = candidate
         self.__current_penalty = prev_penalty
-        applied_action.on_approved(self._queue)
+        applied_action.on_approved(self._queue, self._group_key)
 
     def __rejectCandidate(self, applied_action):
-        logging.debug("action rejected Action:{} Thread:{}".format(applied_action.__class__, threading.get_ident()))
-        applied_action.on_rejected(self._queue)
+        logging.debug("action rejected Action:{}".format(applied_action.__class__))
+        applied_action.on_rejected(self._queue, self._group_key)
 
     def __generateCandidate(self, battle_group, params, generate_actions) -> Tuple:
         actions = list(generate_actions)
@@ -90,16 +96,10 @@ class GroupCollector:
         while new_battle_group is None and actions:
             action_class = actions.pop(random.randint(0, len(actions) - 1))
             action = action_class(params)
-            new_battle_group = action.execute(self._queue, battle_group)
+            new_battle_group = action.execute(self._queue, self._group_key, battle_group)
 
         return new_battle_group, action
 
     @staticmethod
     def __getPenalty(battle_group, penalty_conditions):
         return sum(condition.check(battle_group) for condition in penalty_conditions)
-
-
-class ProcessResult(IntEnum):
-    COLLECTED = auto()
-    NOT_COLLECTED = auto()
-    NO_ACTIONS = auto()
