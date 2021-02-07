@@ -1,45 +1,53 @@
-import bisect
+import heapq
 import random
 from collections import namedtuple
 
-QueueEntry = namedtuple("SimulatedAnnealingMatchmakerQueueEntry", ["enqueue_time", "id", "division"])
+QueueEntry = namedtuple("SimulatedAnnealingMatchmakerQueueEntry", ["priority", "id"])
+
+STIR_COEFFICIENT = 5
 
 
 class Queue(object):
     def __init__(self):
-        self._queue = []
-
-    def __len__(self):
-        return len(self._queue)
+        self._divisions = {}
+        self._queue_by_size = {}
 
     def enqueue(self, division):
-        entry = QueueEntry(division.enqueue_time, division.id, division)
-        bisect.insort(self._queue, entry)
+        priority = division.enqueue_time + STIR_COEFFICIENT * random.random()
+        entry = QueueEntry(priority, division.id)
+        queue = self._queue_by_size.setdefault(division.size, [])
+        heapq.heappush(queue, entry)
+        self._divisions[division.id] = division
 
     def dequeue(self, division):
-        entry = QueueEntry(division.enqueue_time, division.id, division)
-        self._queue.remove(entry)
+        del self._divisions[division.id]
 
     def pop(self, size):
-        if not self._queue:
+        if not self._queue_by_size:
             return None
 
-        random_start_pos = int(pow(0.2, 8*random.random()) * len(self._queue))
+        fit_key_sizes = []
+        for key_size in self._queue_by_size:
+            if key_size <= size:
+                fit_key_sizes.append(key_size)
 
-        index = -1
-        for i, entry in enumerate(self._queue[random_start_pos:], random_start_pos):
-            if entry.division.size <= size:
-                index = i
-                break
-        if index == -1:
-            return None
-
-        return self._queue.pop(index).division
+        random.shuffle(fit_key_sizes)
+        for key_size in fit_key_sizes:
+            division = None
+            queue = self._queue_by_size[key_size]
+            while queue and division is None:
+                division_id = heapq.heappop(queue)
+                division = self._divisions.pop(division_id, None)
+            if not queue:
+                del self._queue_by_size[key_size]
+            if division is not None:
+                return division
+        return None
 
     def clear(self):
-        self._queue.clear()
+        self._queue_by_size.clear()
 
     def __iter__(self):
-        return iter(self._queue)
+        return iter(self._queue_by_size)
 
 
