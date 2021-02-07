@@ -13,6 +13,7 @@ class Queue(object):
         self._queue_by_size = {}
 
     def enqueue(self, division):
+        # stir little bit, so division didn't place with the same divisions again
         priority = division.enqueue_time + STIR_COEFFICIENT * random.random()
         entry = QueueEntry(priority, division.id)
         queue = self._queue_by_size.setdefault(division.size, [])
@@ -25,7 +26,8 @@ class Queue(object):
     def pop(self, size):
         if not self._queue_by_size:
             return None
-
+        
+        # select queues with fit division sizes and pop division from selected random queue
         fit_key_sizes = []
         for key_size in self._queue_by_size:
             if key_size <= size:
