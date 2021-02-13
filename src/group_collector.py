@@ -33,7 +33,7 @@ class GroupCollector:
     def cleanup(self):
         for team in self.__current_battle_group.teams:
             for division in team.divisions:
-                self._queue.enqueue(division)
+                self._queue.enqueue(self._group_key.battle_type, division)
         self.__current_battle_group = None
         return False, None
 

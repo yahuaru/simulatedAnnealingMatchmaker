@@ -3,15 +3,7 @@ from matchmaker_queue.queue_manager import QueueManager
 from group_collector import GroupCollector, ProcessResult
 import time
 
-class MatchmakerThreadBuilder(object):
-    def __init__(self, params):
-        self.__param_by_battle_type = {}
-        for battle_type, battle_type_params in params.items():
-            self.__param_by_battle_type[battle_type] = BattleRules(params[battle_type])
-
-    def build_thread(self, queue, group_key, on_thread_finished):
-        thread_params = self.__param_by_battle_type[group_key.battle_type]
-        return GroupCollector(queue, group_key, thread_params)
+MAX_PROCESS_TIME = 0.7
 
 
 class SimpleMatchmaker:
@@ -25,11 +17,14 @@ class SimpleMatchmaker:
     def process(self):
         key = self.__queue_manager.get_next_available_group_key()
         collector = GroupCollector(self.__queue_manager, key, self.__param_by_battle_type[key.battle_type])
-        current_time = time.time()
+        current_time = start_time = time.time()
         result, group = collector.processBattleGroups(current_time)
-        while result == ProcessResult.NOT_COLLECTED:
+        process_time = time.time() - start_time
+        while result == ProcessResult.NOT_COLLECTED and process_time < MAX_PROCESS_TIME:
+            current_time = time.time()
             result, group = collector.processBattleGroups(current_time)
-        if result == ProcessResult.NO_ACTIONS:
+            process_time = time.time() - start_time
+        if result != ProcessResult.COLLECTED:
             collector.cleanup()
         self.__queue_manager.push_key(key)
         return group
