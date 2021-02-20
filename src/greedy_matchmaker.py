@@ -16,19 +16,39 @@ class GreedMatchmaker:
 	def process(self):
 		battle_group = BattleGroup(Team() for _ in range(self.__teams_num))
 		queue = list(self.__queue)
-		division = queue.pop(0)
-		battle_group = BattleGroup.addDivision(battle_group, 0, division)
-		place_left = self.__team_size * self.__teams_num * sum(team.size for team in battle_group.teams)
-		while place_left and queue:
-			for team_id, team in enumerate(battle_group.teams):
-				if team.size < self.__team_size:
-					for division in queue:
-						if division.size <= self.__team_size - team.size:
-							battle_group = BattleGroup.addDivision(battle_group, team_id, division)
-							queue.remove(division)
-							place_left -= division
+		isSuccessful = False
+		while isSuccessful and queue:
+			battle_group = BattleGroup([Team() for _ in range(self.__teams_num)])
+
+			division = queue.pop(0)
+			while queue and (battle_group.teams[0].size + division.size()) > self.__team_size:
+				division = queue.pop(0)
+			if (battle_group.teams[0].size + division.size()) > self.__team_size:
+				break
+			battle_group = BattleGroup.addDivision(battle_group, 0, division)
+
+			isSuccessful = False
+			for team_id, team in enumerate(battle_group.teams[1:], 1):
+				isSuccessful = False
+				currentAllDivisions = list(queue)
+				for division in currentAllDivisions:
+					divisionShipType = division.getShipTypeNum()
+					isFitting = True
+					for player_type, type_num in battle_group.teams[0].players_types_num.iteritems():
+						if type_num < (team.players_types_num[player_type] + divisionShipType[player_type]):
+							isFitting = False
 							break
-		if place_left > 0:
-			return None
+
+					if isFitting:
+						battle_group = BattleGroup.addDivision(battle_group, team_id, team.addDivision(division))
+						queue.remove(division)
+					if battle_group[0].team_size == team.team_size:
+						isSuccessful = True
+						break
+				if not isSuccessful:
+					break
+
+			if isSuccessful:
+				return battle_group
 
 		return battle_group
