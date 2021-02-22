@@ -2,7 +2,7 @@ import csv
 import random
 import time
 
-from greedy_matchmaker import GreedyMatchmaker
+from greedy_strict_matchmaker import GreedyMatchmaker
 from player import PlayerType
 from tests.helper_functions import generateDivision
 
