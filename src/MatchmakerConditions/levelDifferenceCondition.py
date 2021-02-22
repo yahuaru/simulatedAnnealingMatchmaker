@@ -7,14 +7,18 @@ from MatchmakerConditions.condition import Condition
 
 class LevelDifferenceCondition(Condition):
 	ACTIONS = {AddDivisionActionBase, SwapDivisionsActionBase, RemoveDivisionActionBase, SwapDivisionsFromQueueActionBase}
-	REQUIRED_PARAMS = {"max_level_difference", }
+	REQUIRED_PARAMS = {"by_level", }
 
 	def __init__(self, params):
 		super().__init__(params)
-		self.max_level_difference = params["max_level_difference"]
+		self.max_level_difference = params['by_level']['max_level_difference']
+		self.teams_num = params['teams_num']
 
 	def check(self, battle_group):
-		levels = [division.level for team in battle_group.teams for division in team.divisions]
+		levels = [division.max_level for team in battle_group.teams for division in team.divisions]
+		if not levels:
+			return self.max_level_difference * self.teams_num
+
 		max_level = max(levels)
 
 		penalty = 0
