@@ -1,9 +1,9 @@
 import math
 
-from MatchmakerActions.addDivisionAction import AddDivisionActionBase
-from MatchmakerActions.removeDivisionAction import RemoveDivisionActionBase
-from MatchmakerActions.swapDivisionFromQueueAction import SwapDivisionsFromQueueActionBase
-from MatchmakerActions.swapDivisionsAction import SwapDivisionsActionBase
+from MatchmakerActions.add_division_action import AddDivisionActionBase
+from MatchmakerActions.remove_division_action import RemoveDivisionActionBase
+from MatchmakerActions.swap_division_from_queue_action import SwapDivisionsFromQueueActionBase
+from MatchmakerActions.swap_divisions_action import SwapDivisionsActionBase
 from MatchmakerConditions.condition import Condition
 
 

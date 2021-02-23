@@ -1,6 +1,6 @@
-from MatchmakerConditions.levelDifferenceCondition import LevelDifferenceCondition
-from MatchmakerConditions.playerTypeNumDifferenceCondition import PlayerTypeNumDifferenceCondition
-from MatchmakerConditions.teamSizeCondition import TeamSizeCondition
+from MatchmakerConditions.level_difference_condition import LevelDifferenceCondition
+from MatchmakerConditions.player_type_num_difference import PlayerTypeNumDifferenceCondition
+from MatchmakerConditions.team_size_condition import TeamSizeCondition
 
 CONDITIONS = (TeamSizeCondition, PlayerTypeNumDifferenceCondition, LevelDifferenceCondition)
 

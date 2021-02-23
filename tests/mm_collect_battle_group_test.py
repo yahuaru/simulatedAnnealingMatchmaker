@@ -1,6 +1,6 @@
 import unittest  # The test framework
 
-from battleGroup import Division
+from battle_group import Division
 from player import Player, PlayerType
 from simple_matchmaker import SimpleMatchmaker
 

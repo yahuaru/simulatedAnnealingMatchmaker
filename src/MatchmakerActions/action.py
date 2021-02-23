@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from battleGroup import BattleGroup
+from battle_group import BattleGroup
 from matchmaker_queue.key.queue_key_builder import QueueGroupKey
 
 

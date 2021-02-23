@@ -2,10 +2,9 @@ import time
 import unittest  # The test framework
 from unittest.mock import patch
 
-from battleGroup import Division
+from battle_group import Division
 from player import Player, PlayerType
 from simple_matchmaker import SimpleMatchmaker
-from simulatedAnnealingQueue import QueueEntry
 
 
 TEAMS_NUM = 3

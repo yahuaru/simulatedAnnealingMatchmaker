@@ -4,7 +4,7 @@ import random
 from enum import IntEnum, auto
 from typing import Tuple
 
-from battleGroup import Team, BattleGroup
+from battle_group import Team, BattleGroup
 
 
 class ProcessResult(IntEnum):

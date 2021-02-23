@@ -1,6 +1,6 @@
 import pytest
 
-from battleGroup import Division
+from battle_group import Division
 from matchmaker_queue.key.queue_key_builder import QueueGroupKey
 from player import Player, PlayerType
 from matchmaker_queue.queue_manager import QueueManager

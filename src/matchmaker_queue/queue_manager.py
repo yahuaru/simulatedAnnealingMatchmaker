@@ -3,7 +3,7 @@ from typing import Dict, Optional
 
 from matchmaker_queue.key.queue_key_builder import QueueKeyBuilder, QueueGroupKey
 from matchmaker_queue.queue import Queue
-from battleGroup import Division
+from battle_group import Division
 
 
 class QueueManager(object):

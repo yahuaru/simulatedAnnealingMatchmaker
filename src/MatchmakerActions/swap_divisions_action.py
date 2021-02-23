@@ -1,7 +1,7 @@
 import random
 
 from MatchmakerActions.action import ActionBase
-from battleGroup import BattleGroup
+from battle_group import BattleGroup
 
 
 class SwapDivisionsActionBase(ActionBase):

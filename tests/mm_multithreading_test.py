@@ -2,9 +2,7 @@ import random
 import time
 import unittest
 
-from player import PlayerType, Player
-from simulatedAnnealing import SimulatedAnnealingMatchmaker
-from simulatedAnnealingQueue import QueueEntry
+from player import PlayerType
 from tests.helper_functions import generateDivision
 
 MAX_DIVISION_SIZE = 3
