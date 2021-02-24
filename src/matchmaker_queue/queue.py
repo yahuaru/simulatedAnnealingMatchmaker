@@ -1,3 +1,4 @@
+import bisect
 import heapq
 import random
 from collections import namedtuple
@@ -21,7 +22,7 @@ class Queue(object):
         priority = division.enqueue_time + STIR_COEFFICIENT * random.random()
         entry = QueueEntry(priority, division.id)
         queue = self._queue_by_size.setdefault(division.size, [])
-        heapq.heappush(queue, entry)
+        bisect.insort(queue, entry)
         self._divisions[division.id] = division
 
     def dequeue(self, division):
@@ -42,7 +43,7 @@ class Queue(object):
             division = None
             queue = self._queue_by_size[key_size]
             while queue and division is None:
-                entry = heapq.heappop(queue)
+                entry = queue.pop(int(random.betavariate(1, 3) * len(queue)))
                 division = self._divisions.pop(entry.division_id, None)
             if not queue:
                 del self._queue_by_size[key_size]
