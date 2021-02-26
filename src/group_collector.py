@@ -14,8 +14,8 @@ class ProcessResult(IntEnum):
 
 
 class GroupCollector:
-    def __init__(self, queue, group_key, params_states):
-        self._group_key = group_key
+    def __init__(self, queue, battle_type, params_states):
+        self._battle_type = battle_type
         self._queue = queue
 
         self.__params_states = params_states
@@ -33,7 +33,7 @@ class GroupCollector:
     def cleanup(self):
         for team in self.__current_battle_group.teams:
             for division in team.divisions:
-                self._queue.enqueue(self._group_key.battle_type, division)
+                self._queue.enqueue(self._battle_type, division)
         self.__current_battle_group = None
         return False, None
 
@@ -83,11 +83,11 @@ class GroupCollector:
         logging.debug("action approved Action:{}".format(applied_action.__class__))
         self.__current_battle_group = candidate
         self.__current_penalty = prev_penalty
-        applied_action.on_approved(self._queue, self._group_key)
+        applied_action.on_approved(self._queue, self._battle_type)
 
     def __rejectCandidate(self, applied_action):
         logging.debug("action rejected Action:{}".format(applied_action.__class__))
-        applied_action.on_rejected(self._queue, self._group_key)
+        applied_action.on_rejected(self._queue, self._battle_type)
 
     def __generateCandidate(self, battle_group, params, generate_actions) -> Tuple:
         actions = list(generate_actions)
@@ -96,7 +96,7 @@ class GroupCollector:
         while new_battle_group is None and actions:
             action_class = actions.pop(random.randint(0, len(actions) - 1))
             action = action_class(params)
-            new_battle_group = action.execute(self._queue, self._group_key, battle_group)
+            new_battle_group = action.execute(self._queue, self._battle_type, battle_group)
 
         return new_battle_group, action
 

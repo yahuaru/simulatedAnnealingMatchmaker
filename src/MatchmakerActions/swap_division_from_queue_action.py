@@ -22,9 +22,10 @@ class SwapDivisionsFromQueueActionBase(ActionBase):
 
         team_id, team = random.choice(not_empty_team)
         division = random.choice(team.divisions)
+        new_battle_group = BattleGroup.removeDivision(battle_group, team_id, division)
 
         free_space = self.__max_team_size - team.size
-        division_from_queue = queue.pop(group_key, division.size + free_space)
+        division_from_queue = queue.pop(group_key, new_battle_group, division.size + free_space)
         if division_from_queue is None:
             return None
 
@@ -35,12 +36,12 @@ class SwapDivisionsFromQueueActionBase(ActionBase):
 
         return new_battle_group
 
-    def on_approved(self, queue, group_key):
-        queue.enqueue(group_key.battle_type, self.__removed_division)
+    def on_approved(self, queue, battle_type):
+        queue.enqueue(battle_type, self.__removed_division)
         self.__added_division = None
         self.__removed_division = None
 
-    def on_rejected(self, queue, group_key):
-        queue.enqueue(group_key.battle_type, self.__added_division)
+    def on_rejected(self, queue, battle_type):
+        queue.enqueue(battle_type, self.__added_division)
         self.__added_division = None
         self.__removed_division = None

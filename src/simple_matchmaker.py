@@ -1,3 +1,5 @@
+import random
+
 from group_rules import BattleRules
 from matchmaker_queue.queue_manager import QueueManager
 from group_collector import GroupCollector, ProcessResult
@@ -10,13 +12,15 @@ class SimpleMatchmaker:
     def __init__(self, params):
         self.__queue_manager = QueueManager(params)
 
+        self.__available_battle_types = []
         self.__param_by_battle_type = {}
         for battle_type, battle_type_params in params.items():
+            self.__available_battle_types.append(battle_type)
             self.__param_by_battle_type[battle_type] = BattleRules(params[battle_type])
 
     def process(self):
-        key = self.__queue_manager.get_next_available_group_key()
-        collector = GroupCollector(self.__queue_manager, key, self.__param_by_battle_type[key.battle_type])
+        battle_type = random.choice(self.__available_battle_types)
+        collector = GroupCollector(self.__queue_manager, battle_type, self.__param_by_battle_type[battle_type])
         current_time = start_time = time.time()
         result, group = collector.processBattleGroups(current_time)
         process_time = time.time() - start_time
@@ -26,7 +30,6 @@ class SimpleMatchmaker:
             process_time = time.time() - start_time
         if result != ProcessResult.COLLECTED:
             collector.cleanup()
-        self.__queue_manager.push_key(key)
         return group
 
     def enqueueDivision(self, battle_type, division):

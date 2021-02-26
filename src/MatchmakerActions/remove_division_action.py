@@ -9,7 +9,7 @@ class RemoveDivisionActionBase(ActionBase):
         super().__init__(params)
         self.__removed_division = None
 
-    def execute(self, queue, group_key, battle_group):
+    def execute(self, queue, battle_type, battle_group):
         not_empty_team = [(team_id, team) for team_id, team in enumerate(battle_group.teams) if team.size > 0]
         if not not_empty_team:
             return None
@@ -22,9 +22,9 @@ class RemoveDivisionActionBase(ActionBase):
         self.__removed_division = division
         return new_battle_group
 
-    def on_approved(self, queue, group_key):
-        queue.enqueue(group_key.battle_type, self.__removed_division)
+    def on_approved(self, queue, battle_type):
+        queue.enqueue(battle_type, self.__removed_division)
         self.__removed_division = None
 
-    def on_rejected(self, queue, group_key):
+    def on_rejected(self, queue, battle_type):
         self.__removed_division = None

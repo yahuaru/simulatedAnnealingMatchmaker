@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
 from battle_group import BattleGroup
-from matchmaker_queue.key.queue_key_builder import QueueGroupKey
 
 
 class ActionBase(ABC):
@@ -9,11 +8,11 @@ class ActionBase(ABC):
         pass
 
     @abstractmethod
-    def execute(self, queue, group_key: QueueGroupKey, battle_group: BattleGroup):
+    def execute(self, queue, battle_type, battle_group: BattleGroup):
         pass
 
-    def on_approved(self, queue, group_key: QueueGroupKey):
+    def on_approved(self, queue, battle_type):
         pass
 
-    def on_rejected(self, queue, group_key: QueueGroupKey):
+    def on_rejected(self, queue, battle_type):
         pass

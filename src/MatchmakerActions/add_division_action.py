@@ -19,7 +19,7 @@ class AddDivisionActionBase(ActionBase):
             return None
 
         team_id, vacant_team = random.choice(vacant_teams)
-        division_from_queue = queue.pop(group_key, self.__max_team_size - vacant_team.size)
+        division_from_queue = queue.pop(group_key, battle_group, self.__max_team_size - vacant_team.size)
         if division_from_queue is None:
             return None
 
@@ -28,10 +28,10 @@ class AddDivisionActionBase(ActionBase):
 
         return new_battle_group
 
-    def on_approved(self, queue, group_key):
+    def on_approved(self, queue, battle_type):
         self.__added_division = None
 
-    def on_rejected(self, queue, group_key):
-        queue.enqueue(group_key.battle_type, self.__added_division)
+    def on_rejected(self, queue, battle_type):
+        queue.enqueue(battle_type, self.__added_division)
         self.__added_division = None
 

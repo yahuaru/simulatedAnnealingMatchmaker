@@ -14,5 +14,5 @@ class IQueueKeyGenerator(ABC):
         pass
 
     @abstractmethod
-    def get_group_keys(self, division):
+    def get_available_keys(self, battle_group):
         pass
