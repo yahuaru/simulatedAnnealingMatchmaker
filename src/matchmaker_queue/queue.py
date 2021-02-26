@@ -1,11 +1,12 @@
 import bisect
 import heapq
+import math
 import random
 from collections import namedtuple
 
 QueueEntry = namedtuple("SimulatedAnnealingMatchmakerQueueEntry", ["priority", "division_id"])
 
-STIR_COEFFICIENT = 5
+POP_PRIORITY_COEFFICIENT = 0.2
 
 
 class Queue(object):
@@ -19,8 +20,7 @@ class Queue(object):
     def enqueue(self, division):
         assert division.id not in self._divisions
         # stir little bit, so division didn't place with the same divisions again
-        priority = division.enqueue_time + STIR_COEFFICIENT * random.random()
-        entry = QueueEntry(priority, division.id)
+        entry = QueueEntry(division.enqueue_time, division.id)
         queue = self._queue_by_size.setdefault(division.size, [])
         bisect.insort(queue, entry)
         self._divisions[division.id] = division
@@ -43,7 +43,7 @@ class Queue(object):
             division = None
             queue = self._queue_by_size[key_size]
             while queue and division is None:
-                entry = queue.pop(int(random.betavariate(1, 3) * len(queue)))
+                entry = queue.pop(random.randint(0, int(len(queue) * POP_PRIORITY_COEFFICIENT)))
                 division = self._divisions.pop(entry.division_id, None)
             if not queue:
                 del self._queue_by_size[key_size]
