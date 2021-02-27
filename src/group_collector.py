@@ -4,7 +4,6 @@ import random
 from enum import IntEnum, auto
 from typing import Tuple
 
-from stat_logging import stat_logging
 from battle_group import Team, BattleGroup
 
 
@@ -63,27 +62,18 @@ class GroupCollector:
             self.__acceptCandidate(candidate, candidate_penalty, applied_action)
             return ProcessResult.COLLECTED, candidate
 
-        current_temperature = candidate_rules.temperature
-        if self.__current_iteration > 0:
-            current_temperature = candidate_rules.temperature / math.log(1 + self.__current_iteration)
-
         if candidate_penalty > self.__current_penalty:
-            penalty_delta = candidate_penalty - self.__current_penalty
-            probability = math.exp(-penalty_delta / current_temperature)
+            current_temperature = candidate_rules.temperature
+            if self.__current_iteration > 0:
+                current_temperature = candidate_rules.temperature / math.log(1 + self.__current_iteration)
+
+            probability = math.exp(-(candidate_penalty - self.__current_penalty) / current_temperature)
             if random.random() < probability:
                 self.__acceptCandidate(candidate, candidate_penalty, applied_action)
-                penalties = {}
-                for condition in candidate_rules.conditions:
-                    penalties[condition.__class__.__name__] = condition.check(candidate)
-                stat_logging.log_iteration(self.__current_iteration, probability, current_temperature, candidate_penalty, penalty_delta, penalties)
             else:
                 self.__rejectCandidate(applied_action)
         else:
             self.__acceptCandidate(candidate, candidate_penalty, applied_action)
-            penalties = {}
-            for condition in candidate_rules.conditions:
-                penalties[condition.__class__.__name__] = condition.check(candidate)
-            stat_logging.log_iteration(self.__current_iteration, 1.0, current_temperature, candidate_penalty, 0, penalties)
 
         self.__current_iteration += 1
 
