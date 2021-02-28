@@ -26,5 +26,5 @@ class QueueKeyBuilder(object):
     def get_available_keys(self, battle_type, battle_group):
         descriptions = []
         for queue_key_builder in self._queue_key_builders[battle_type]:
-            descriptions.append(queue_key_builder.get_group_keys(battle_group))
+            descriptions.append(queue_key_builder.get_available_keys(battle_group))
         return descriptions
