@@ -1,13 +1,15 @@
-from collector.conditions.condition import ICondition
+from .condition import ICondition
 
 
 class LevelDifferenceCondition(ICondition):
-	REQUIRED_RULE_FIELDS = {"by_level", }
-
 	def __init__(self, params):
 		super().__init__(params)
-		self.max_level_difference = params['by_level']['max_level_difference']
+		self.max_level_difference = params['max_level_difference']
 		self.teams_num = params['teams_num']
+
+	@classmethod
+	def get_required_rule_fields(cls):
+		return {"max_level_difference", 'teams_num'}
 
 	def check(self, battle_group):
 		levels = [division.max_level for team in battle_group.teams for division in team.divisions]

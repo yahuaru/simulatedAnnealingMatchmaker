@@ -1,15 +1,18 @@
-from collector.conditions.condition import ICondition
+from typing import Set
+from .condition import ICondition
 
 
 class TeamSizeCondition(ICondition):
-    REQUIRED_PARAMS = {'teams_num', 'min_team_size', 'max_team_size'}
-
     def __init__(self, params):
         super().__init__(params)
         self.__min_team_size = params['min_team_size']
         self.__max_team_size = params['max_team_size']
 
         self.__team_size_equal = params.get('team_size_equal', True)
+
+    @classmethod
+    def get_required_rule_fields(cls) -> Set:
+        return {'min_team_size', 'max_team_size'}
 
     def check(self, battle_group):
         max_team_size = max(team.size for team in battle_group.teams)

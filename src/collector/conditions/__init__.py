@@ -9,7 +9,7 @@ def buildConditions(params):
     conditions = []
     param_fields = set(params.keys())
     for condition in CONDITIONS:
-        if condition.REQUIRED_RULE_FIELDS.issubset(param_fields):
+        if condition.get_required_rule_fields().issubset(param_fields):
             conditions.append(condition(params))
 
     return conditions

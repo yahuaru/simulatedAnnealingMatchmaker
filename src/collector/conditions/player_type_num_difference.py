@@ -1,14 +1,18 @@
-from collector.conditions.condition import ICondition
+from typing import Set
+
+from .condition import ICondition
 from player import PlayerType
 
 
 class PlayerTypeNumDifferenceCondition(ICondition):
-    REQUIRED_PARAMS = {"player_type_num_diff", "teams_num", "max_team_size"}
-
     def __init__(self, params):
         super().__init__(params)
         self.__player_type_num_diff = params['player_type_num_diff']
         self.__teams_num = params['teams_num']
+
+    @classmethod
+    def get_required_rule_fields(cls) -> Set:
+        return {"player_type_num_diff", "teams_num"}
 
     def check(self, battle_group):
         penalty = 0

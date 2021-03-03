@@ -1,13 +1,16 @@
 from abc import ABC, abstractmethod
+from typing import Set
 
 
 class ICondition(ABC):
-    ACTIONS = set()
-    REQUIRED_RULE_FIELDS = set()
-
     @abstractmethod
     def __init__(self, params):
         pass
+
+    @classmethod
+    @abstractmethod
+    def get_required_rule_fields(cls) -> Set:
+        return set()
 
     @abstractmethod
     def check(self, battle_group):
