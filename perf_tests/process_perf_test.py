@@ -20,24 +20,24 @@ ADD_TEAM_SEC = 0.5
 DIVISIONS_NUM = 1000
 
 params = {
-            'common_conditions': {
-                'teams_num': TEAMS_NUM,
-            },
-            'by_time': {
-                0: {
-                    'conditions': {
-                        'min_team_size': MAX_TEAM_SIZE,
-                        'max_team_size': MAX_TEAM_SIZE,
-                        'player_type_num_diff': {
-                            PlayerType.ALPHA: 0,
-                            PlayerType.BETA: 0,
-                            PlayerType.GAMMA: 0,
-                        },
-                    },
-                    'initial_temperature': 3
+    'common_conditions': {
+        'teams_num': TEAMS_NUM,
+    },
+    'by_time': {
+        0: {
+            'conditions': {
+                'min_team_size': MAX_TEAM_SIZE,
+                'max_team_size': MAX_TEAM_SIZE,
+                'player_type_num_diff': {
+                    PlayerType.ALPHA: 0,
+                    PlayerType.BETA: 0,
+                    PlayerType.GAMMA: 0,
                 },
-            }
-        }
+            },
+            'initial_temperature': 3
+        },
+    }
+}
 
 
 class Test_SimulatedAnnealingMatchmakerQueue(unittest.TestCase):

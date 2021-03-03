@@ -1,6 +1,4 @@
 import bisect
-import heapq
-import math
 import random
 from collections import namedtuple
 
@@ -52,5 +50,3 @@ class Queue(object):
 
     def __iter__(self):
         return iter(self._queue_by_size)
-
-

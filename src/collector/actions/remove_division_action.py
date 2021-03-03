@@ -1,10 +1,10 @@
 import random
 
-from MatchmakerActions.action import ActionBase
+from collector.actions.action import ActionBase
 from battle_group import BattleGroup
 
 
-class RemoveDivisionActionBase(ActionBase):
+class RemoveDivisionAction(ActionBase):
     def __init__(self, params):
         super().__init__(params)
         self.__removed_division = None

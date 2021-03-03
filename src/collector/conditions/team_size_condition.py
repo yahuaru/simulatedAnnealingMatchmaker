@@ -1,14 +1,7 @@
-import math
-
-from MatchmakerActions.add_division_action import AddDivisionActionBase
-from MatchmakerActions.remove_division_action import RemoveDivisionActionBase
-from MatchmakerActions.swap_division_from_queue_action import SwapDivisionsFromQueueActionBase
-from MatchmakerActions.swap_divisions_action import SwapDivisionsActionBase
-from MatchmakerConditions.condition import Condition
+from collector.conditions.condition import ICondition
 
 
-class TeamSizeCondition(Condition):
-    ACTIONS = {AddDivisionActionBase, SwapDivisionsActionBase, RemoveDivisionActionBase, SwapDivisionsFromQueueActionBase}
+class TeamSizeCondition(ICondition):
     REQUIRED_PARAMS = {'teams_num', 'min_team_size', 'max_team_size'}
 
     def __init__(self, params):

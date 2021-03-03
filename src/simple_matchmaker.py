@@ -1,8 +1,8 @@
 import random
 
-from group_rules import BattleRules
+from battle_rules import BattleRules
 from matchmaker_queue.queue_manager import QueueManager
-from group_collector import GroupCollector, ProcessResult
+from collector.group_collector import GroupCollector, ProcessResult
 import time
 
 MAX_PROCESS_TIME = 0.7

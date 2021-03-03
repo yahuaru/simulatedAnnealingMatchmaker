@@ -1,11 +1,10 @@
-import logging
 import random
 
-from MatchmakerActions.action import ActionBase
+from collector.actions.action import ActionBase
 from battle_group import BattleGroup
 
 
-class SwapDivisionsFromQueueActionBase(ActionBase):
+class SwapDivisionsFromQueueAction(ActionBase):
     def __init__(self, params):
         super().__init__(params)
         self.__max_team_size = params['max_team_size']

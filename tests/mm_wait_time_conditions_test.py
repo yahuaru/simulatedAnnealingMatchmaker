@@ -1,11 +1,9 @@
-import time
 import unittest  # The test framework
 from unittest.mock import patch
 
 from battle_group import Division
 from player import Player, PlayerType
 from simple_matchmaker import SimpleMatchmaker
-
 
 TEAMS_NUM = 3
 MAX_TEAM_SIZE = 3

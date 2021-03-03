@@ -4,10 +4,8 @@ import time
 import numpy as np
 import pandas as pd
 
-from MatchmakerConditions import buildConditions
-from battleGroup import Team, BattleGroup
+from collector.conditions import buildConditions
 from player import PlayerType
-from simulatedAnnealing import SimulatedAnnealingMatchmaker, SimulatedAnnealingMatchmakerLogger
 
 
 class Logger(SimulatedAnnealingMatchmakerLogger):
@@ -50,7 +48,6 @@ teams = [Team() for _ in range(params["teams_num"])]
 current_battle_group = BattleGroup(teams)
 print(sum(condition.check(current_battle_group) for condition in conditions))
 
-
 try_name = "n{}_ts{}".format(TEAMS_NUM, TEAM_SIZE)
 
 logger = Logger()
@@ -82,7 +79,7 @@ for i in range(MAX_TRIES):
 
     try_data.append([successful, mm.currentIteration, process_time])
 
-    print("{:.0%} failed:{:.0%}".format(i / MAX_TRIES, failed_attempts/MAX_TRIES))
+    print("{:.0%} failed:{:.0%}".format(i / MAX_TRIES, failed_attempts / MAX_TRIES))
 
     mm.clear()
     logger.cleanup()
@@ -92,7 +89,6 @@ df_iterations = pd.DataFrame([iteration[1:] for iteration in logger.iterations],
                                                              names=["try_num", "iteration"]),
                              columns=["temperature", "energy", "probability"])
 df_try = pd.DataFrame(try_data, columns=["successful", "final_iteration", "process_time"])
-
 
 df_iterations.to_csv('data/iterations_data_{}.csv'.format(try_name), )
 df_try.to_csv('data/try_data_{}.csv'.format(try_name))

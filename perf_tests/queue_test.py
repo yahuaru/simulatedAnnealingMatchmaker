@@ -1,12 +1,10 @@
-import time
 import unittest
 from unittest.mock import patch
 
-import simulatedAnnealingThread
-from player import PlayerType
-from simulatedAnnealing import SimulatedAnnealingMatchmaker
-from tests.helper_functions import generateDivision
 import pandas as pd
+
+from player import PlayerType
+from tests.helper_functions import generateDivision
 
 THREADS_NUM = 2
 TEAMS_NUM = 4
@@ -17,49 +15,49 @@ SEC_PER_TICK = 0.01
 
 ADD_TEAM_SEC = 0.5
 
-
 params = {
-            'common_conditions': {
-                'teams_num': TEAMS_NUM,
+    'common_conditions': {
+        'teams_num': TEAMS_NUM,
+    },
+    'by_time': {
+        0: {
+            'conditions': {
+                'min_team_size': MAX_TEAM_SIZE,
+                'max_team_size': MAX_TEAM_SIZE,
+                'player_type_num_diff': {
+                    PlayerType.ALPHA: 0,
+                    PlayerType.BETA: 0,
+                    PlayerType.GAMMA: 0,
+                },
             },
-            'by_time': {
-                0: {
-                    'conditions': {
-                        'min_team_size': MAX_TEAM_SIZE,
-                        'max_team_size': MAX_TEAM_SIZE,
-                        'player_type_num_diff': {
-                            PlayerType.ALPHA: 0,
-                            PlayerType.BETA: 0,
-                            PlayerType.GAMMA: 0,
-                        },
-                    },
-                    'initial_temperature': 3
+            'initial_temperature': 3
+        },
+        200: {
+            'conditions': {
+                'min_team_size': 1,
+                'max_team_size': MAX_TEAM_SIZE,
+                'team_size_equal': True,
+                'player_type_num_diff': {
+                    PlayerType.ALPHA: 0,
+                    PlayerType.BETA: 0,
+                    PlayerType.GAMMA: 0,
                 },
-                200: {
-                    'conditions': {
-                        'min_team_size': 1,
-                        'max_team_size': MAX_TEAM_SIZE,
-                        'team_size_equal': True,
-                        'player_type_num_diff': {
-                            PlayerType.ALPHA: 0,
-                            PlayerType.BETA: 0,
-                            PlayerType.GAMMA: 0,
-                        },
-                    },
-                    'initial_temperature': 3,
-                },
-                300: {
-                    'conditions': {
-                        'min_team_size': MIN_TEAM_SIZE,
-                        'max_team_size': MAX_TEAM_SIZE,
-                        'team_size_equal': False,
-                    },
-                    'initial_temperature': 3,
-                },
-            }
-        }
+            },
+            'initial_temperature': 3,
+        },
+        300: {
+            'conditions': {
+                'min_team_size': MIN_TEAM_SIZE,
+                'max_team_size': MAX_TEAM_SIZE,
+                'team_size_equal': False,
+            },
+            'initial_temperature': 3,
+        },
+    }
+}
 
 DIVISIONS_NUM = 1000
+
 
 class Test_SimulatedAnnealingMatchmakerQueue(unittest.TestCase):
     def setUp(self) -> None:
