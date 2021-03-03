@@ -30,16 +30,16 @@ class SwapDivisionsAction(ActionBase):
         if division is not None and other_division is not None:
             if (division.size <= (other_division.size + self.__max_team_size - other_team.size)
                     and other_division.size <= (division.size + self.__max_team_size - team.size)):
-                new_battle_group = BattleGroup.swapDivision(battle_group, team_id, division, other_division)
-                new_battle_group = BattleGroup.swapDivision(new_battle_group, other_team_id, other_division, division)
+                new_battle_group = BattleGroup.swap_division(battle_group, team_id, division, other_division)
+                new_battle_group = BattleGroup.swap_division(new_battle_group, other_team_id, other_division, division)
                 return new_battle_group
         elif division is not None and division.size <= (self.__max_team_size - other_team.size):
-            new_battle_group = BattleGroup.removeDivision(battle_group, team_id, division)
-            new_battle_group = BattleGroup.addDivision(new_battle_group, other_team_id, division)
+            new_battle_group = BattleGroup.remove_division(battle_group, team_id, division)
+            new_battle_group = BattleGroup.add_division(new_battle_group, other_team_id, division)
             return new_battle_group
         elif other_division is not None and other_division.size <= (self.__max_team_size - team.size):
-            new_battle_group = BattleGroup.addDivision(battle_group, team_id, other_division)
-            new_battle_group = BattleGroup.removeDivision(new_battle_group, other_team_id, other_division)
+            new_battle_group = BattleGroup.add_division(battle_group, team_id, other_division)
+            new_battle_group = BattleGroup.remove_division(new_battle_group, other_team_id, other_division)
             return new_battle_group
 
         return None

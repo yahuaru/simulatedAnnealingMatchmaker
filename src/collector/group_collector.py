@@ -28,7 +28,7 @@ class GroupCollector:
 
         initial_state = self.__params_states.get_state_by_time(0)
         initial_conditions = initial_state.conditions
-        self.__current_penalty = self.__getPenalty(self.__current_battle_group, initial_conditions)
+        self.__current_penalty = self.__get_penalty(self.__current_battle_group, initial_conditions)
 
     def cleanup(self):
         for team in self.__current_battle_group.teams:
@@ -37,8 +37,8 @@ class GroupCollector:
         self.__current_battle_group = None
         return False, None
 
-    def processBattleGroups(self, current_time):
-        if self.__current_battle_group.isEmpty():
+    def process_battle_groups(self, current_time):
+        if self.__current_battle_group.is_empty():
             current_wait_time = 0
         else:
             current_wait_time = current_time - self.__current_battle_group.min_enqueue_time
@@ -47,19 +47,19 @@ class GroupCollector:
         current_actions = current_rules.actions
         current_conditions_param = current_rules.conditions_param
 
-        candidate, applied_action = self.__generateCandidate(self.__current_battle_group, current_conditions_param,
-                                                             current_actions)
+        candidate, applied_action = self.__generate_candidate(self.__current_battle_group, current_conditions_param,
+                                                              current_actions)
         if candidate is None:
             return ProcessResult.NO_ACTIONS, None
-        elif candidate.isEmpty():
+        elif candidate.is_empty():
             return ProcessResult.NOT_COLLECTED, None
 
         current_candidate_wait_time = current_time - candidate.min_enqueue_time
         candidate_rules = self.__params_states.get_state_by_time(current_candidate_wait_time)
-        candidate_penalty = self.__getPenalty(candidate, candidate_rules.conditions)
+        candidate_penalty = self.__get_penalty(candidate, candidate_rules.conditions)
 
         if candidate_penalty == 0:
-            self.__acceptCandidate(candidate, candidate_penalty, applied_action)
+            self.__accept_candidate(candidate, candidate_penalty, applied_action)
             return ProcessResult.COLLECTED, candidate
 
         if candidate_penalty > self.__current_penalty:
@@ -69,27 +69,27 @@ class GroupCollector:
 
             probability = math.exp(-(candidate_penalty - self.__current_penalty) / current_temperature)
             if random.random() < probability:
-                self.__acceptCandidate(candidate, candidate_penalty, applied_action)
+                self.__accept_candidate(candidate, candidate_penalty, applied_action)
             else:
-                self.__rejectCandidate(applied_action)
+                self.__reject_candidate(applied_action)
         else:
-            self.__acceptCandidate(candidate, candidate_penalty, applied_action)
+            self.__accept_candidate(candidate, candidate_penalty, applied_action)
 
         self.__current_iteration += 1
 
         return ProcessResult.NOT_COLLECTED, None
 
-    def __acceptCandidate(self, candidate, prev_penalty, applied_action):
+    def __accept_candidate(self, candidate, prev_penalty, applied_action):
         logging.debug("action approved Action:{}".format(applied_action.__class__))
         self.__current_battle_group = candidate
         self.__current_penalty = prev_penalty
         applied_action.on_approved(self._queue, self._battle_type)
 
-    def __rejectCandidate(self, applied_action):
+    def __reject_candidate(self, applied_action):
         logging.debug("action rejected Action:{}".format(applied_action.__class__))
         applied_action.on_rejected(self._queue, self._battle_type)
 
-    def __generateCandidate(self, battle_group, params, generate_actions) -> Tuple:
+    def __generate_candidate(self, battle_group, params, generate_actions) -> Tuple:
         actions = list(generate_actions)
         action = None
         new_battle_group = None
@@ -101,5 +101,5 @@ class GroupCollector:
         return new_battle_group, action
 
     @staticmethod
-    def __getPenalty(battle_group, penalty_conditions):
+    def __get_penalty(battle_group, penalty_conditions):
         return sum(condition.check(battle_group) for condition in penalty_conditions)

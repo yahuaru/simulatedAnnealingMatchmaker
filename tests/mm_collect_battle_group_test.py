@@ -44,24 +44,24 @@ class Test_CollectBattleGroup(unittest.TestCase):
             player = Player(PlayerType.ALPHA, 0)
             index += 1
             division = Division(index)
-            division.addPlayer(player)
-            self.mm.enqueueDivision("test_battle_group", division)
+            division.add_player(player)
+            self.mm.enqueue_division("test_battle_group", division)
             divisions.append(division)
 
         for i in range(TEAMS_NUM):
             player = Player(PlayerType.BETA, 0)
             index += 1
             division = Division(index)
-            division.addPlayer(player)
-            self.mm.enqueueDivision("test_battle_group", division)
+            division.add_player(player)
+            self.mm.enqueue_division("test_battle_group", division)
             divisions.append(division)
 
         for i in range(TEAMS_NUM):
             player = Player(PlayerType.GAMMA, 0)
             index += 1
             division = Division(index)
-            division.addPlayer(player)
-            self.mm.enqueueDivision("test_battle_group", division)
+            division.add_player(player)
+            self.mm.enqueue_division("test_battle_group", division)
             divisions.append(division)
 
         battle_group = self.mm.process()
@@ -96,7 +96,7 @@ class Test_CollectBattleGroup(unittest.TestCase):
                          Player(PlayerType.GAMMA, 0)]),
         ]
         for division in divisions:
-            self.mm.enqueueDivision('test_battle_group', division)
+            self.mm.enqueue_division('test_battle_group', division)
 
         battle_group = self.mm.process()
         self.assertIsNotNone(battle_group)

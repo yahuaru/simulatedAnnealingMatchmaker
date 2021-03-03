@@ -2,7 +2,7 @@ import time
 import unittest
 
 from player import PlayerType
-from tests.helper_functions import generateDivision
+from tests.helper_functions import generate_division
 
 MAX_DIVISION_SIZE = 3
 TEAMS_NUM = 4
@@ -64,8 +64,8 @@ class Test_MultithreadingMatchmaker(unittest.TestCase):
     def test_processBattleGroup(self):
         index = 0
         for i in range(1000):
-            division = generateDivision(index, MAX_DIVISION_SIZE, enqueue_time=time.time())
-            self.mm.enqueueDivision(division)
+            division = generate_division(index, MAX_DIVISION_SIZE, enqueue_time=time.time())
+            self.mm.enqueue_division(division)
             index += 1
 
         self.start_time = time.time()

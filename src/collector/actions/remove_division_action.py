@@ -17,7 +17,7 @@ class RemoveDivisionAction(ActionBase):
         team_id, team = random.choice(not_empty_team)
         division = random.choice(team.divisions)
 
-        new_battle_group = BattleGroup.removeDivision(battle_group, team_id, division)
+        new_battle_group = BattleGroup.remove_division(battle_group, team_id, division)
 
         self.__removed_division = division
         return new_battle_group

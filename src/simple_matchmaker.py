@@ -22,19 +22,18 @@ class SimpleMatchmaker:
         battle_type = random.choice(self.__available_battle_types)
         collector = GroupCollector(self.__queue_manager, battle_type, self.__param_by_battle_type[battle_type])
         current_time = start_time = time.time()
-        result, group = collector.processBattleGroups(current_time)
+        result, group = collector.process_battle_groups(current_time)
         process_time = time.time() - start_time
         while result == ProcessResult.NOT_COLLECTED and process_time < MAX_PROCESS_TIME:
             current_time = time.time()
-            result, group = collector.processBattleGroups(current_time)
+            result, group = collector.process_battle_groups(current_time)
             process_time = time.time() - start_time
         if result != ProcessResult.COLLECTED:
             collector.cleanup()
         return group
 
-    def enqueueDivision(self, battle_type, division):
+    def enqueue_division(self, battle_type, division):
         self.__queue_manager.enqueue(battle_type, division)
 
-    def dequeueDivision(self, battle_type, division):
+    def dequeue_division(self, battle_type, division):
         self.__queue_manager.dequeue(battle_type, division)
-

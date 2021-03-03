@@ -3,12 +3,12 @@ from .condition import ICondition
 
 
 class TeamSizeCondition(ICondition):
-    def __init__(self, params):
-        super().__init__(params)
-        self.__min_team_size = params['min_team_size']
-        self.__max_team_size = params['max_team_size']
+    def __init__(self, rules):
+        super().__init__(rules)
+        self.__min_team_size = rules['min_team_size']
+        self.__max_team_size = rules['max_team_size']
 
-        self.__team_size_equal = params.get('team_size_equal', True)
+        self.__team_size_equal = rules.get('team_size_equal', True)
 
     @classmethod
     def get_required_rule_fields(cls) -> Set:

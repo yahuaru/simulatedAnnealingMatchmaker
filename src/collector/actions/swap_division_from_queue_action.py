@@ -21,14 +21,14 @@ class SwapDivisionsFromQueueAction(ActionBase):
 
         team_id, team = random.choice(not_empty_team)
         division = random.choice(team.divisions)
-        new_battle_group = BattleGroup.removeDivision(battle_group, team_id, division)
+        new_battle_group = BattleGroup.remove_division(battle_group, team_id, division)
 
         free_space = self.__max_team_size - team.size
         division_from_queue = queue.pop(group_key, new_battle_group, division.size + free_space)
         if division_from_queue is None:
             return None
 
-        new_battle_group = BattleGroup.swapDivision(battle_group, team_id, division, division_from_queue)
+        new_battle_group = BattleGroup.swap_division(battle_group, team_id, division, division_from_queue)
 
         self.__removed_division = division
         self.__added_division = division_from_queue

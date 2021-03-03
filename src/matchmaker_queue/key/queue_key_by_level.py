@@ -18,7 +18,7 @@ class QueueKeyByLevel(IQueueKeyGenerator):
         return division.max_level
 
     def get_available_keys(self, battle_group) -> List:
-        if battle_group.isEmpty():
+        if battle_group.is_empty():
             return list(range(self._min_level, self._max_level + 1))
 
         max_level = 0

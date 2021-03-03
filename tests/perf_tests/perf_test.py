@@ -5,7 +5,7 @@ import time
 
 from player import PlayerType
 from simple_matchmaker import SimpleMatchmaker
-from tests.helper_functions import generateDivision
+from tests.helper_functions import generate_division
 
 MAX_PROCESS_TIME = 0.7
 MAX_TRIES = 1000
@@ -60,9 +60,9 @@ for j in range(10):
 
     for i in range(divisions_num):
         enqueue_time = random.random() * 100.0
-        division = generateDivision(index, 3, enqueue_time, 1, 8)
+        division = generate_division(index, 3, enqueue_time, 1, 8)
         index += 1
-        mm.enqueueDivision("test_battle_group", division)
+        mm.enqueue_division("test_battle_group", division)
 
     battle_group = mm.process()
     try_data = []

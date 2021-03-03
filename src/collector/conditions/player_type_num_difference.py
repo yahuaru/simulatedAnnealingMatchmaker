@@ -5,10 +5,10 @@ from player import PlayerType
 
 
 class PlayerTypeNumDifferenceCondition(ICondition):
-    def __init__(self, params):
-        super().__init__(params)
-        self.__player_type_num_diff = params['player_type_num_diff']
-        self.__teams_num = params['teams_num']
+    def __init__(self, rules):
+        super().__init__(rules)
+        self.__player_type_num_diff = rules['player_type_num_diff']
+        self.__teams_num = rules['teams_num']
 
     @classmethod
     def get_required_rule_fields(cls) -> Set:

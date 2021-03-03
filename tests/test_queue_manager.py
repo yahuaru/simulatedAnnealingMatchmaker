@@ -45,7 +45,7 @@ def test_get_next_available_queue(queue_manager):
             division = Division(index)
             for j in range(max_division_size):
                 player = Player(PlayerType.ALPHA, level)
-                division.addPlayer(player)
+                division.add_player(player)
             divisions.append(division)
             index += 1
             queue_manager.enqueue('test', division)

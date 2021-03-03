@@ -4,7 +4,7 @@ from typing import Set
 
 class ICondition(ABC):
     @abstractmethod
-    def __init__(self, params):
+    def __init__(self, rules):
         pass
 
     @classmethod

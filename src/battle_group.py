@@ -13,7 +13,7 @@ class Division:
             self.max_level = max(self.max_level, player.level)
         self.enqueue_time = enqueue_time
 
-    def addPlayer(self, player):
+    def add_player(self, player):
         self.size += 1
         self.players.append(player)
         self.players_types_num[player.type] += 1
@@ -37,7 +37,7 @@ class Team:
             self.size += division.size
             self.max_level = max(self.max_level, division.max_level)
 
-    def addDivision(self, division):
+    def add_division(self, division):
         self.divisions.append(division)
         for playerType in list(PlayerType):
             self.players_types_num[playerType] += division.players_types_num[playerType]
@@ -45,7 +45,7 @@ class Team:
         self.min_enqueue_time = min(division.enqueue_time for division in self.divisions)
         self.max_level = max(self.max_level, division.max_level)
 
-    def removeDivision(self, division):
+    def remove_division(self, division):
         self.divisions.remove(division)
         for playerType in list(PlayerType):
             self.players_types_num[playerType] -= division.players_types_num[playerType]
@@ -71,35 +71,35 @@ class BattleGroup:
     def __init__(self, teams=None) -> None:
         self.teams = teams if teams is not None else []
 
-    def isEmpty(self):
+    def is_empty(self):
         return not any(team.size != 0 for team in self.teams)
 
     def size(self):
         return len(self.teams)
 
     @staticmethod
-    def addDivision(battle_group, team_id, division):
+    def add_division(battle_group, team_id, division):
         new_battle_group = battle_group.copy()
         team = new_battle_group.teams[team_id].copy()
         new_battle_group.teams[team_id] = team
-        team.addDivision(division)
+        team.add_division(division)
         return new_battle_group
 
     @staticmethod
-    def removeDivision(battle_group, team_id, division):
+    def remove_division(battle_group, team_id, division):
         new_battle_group = battle_group.copy()
         team = new_battle_group.teams[team_id].copy()
         new_battle_group.teams[team_id] = team
-        team.removeDivision(division)
+        team.remove_division(division)
         return new_battle_group
 
     @staticmethod
-    def swapDivision(battle_group, team_id, removed_division, add_division):
+    def swap_division(battle_group, team_id, removed_division, add_division):
         new_battle_group = battle_group.copy()
         team = new_battle_group.teams[team_id].copy()
         new_battle_group.teams[team_id] = team
-        team.removeDivision(removed_division)
-        team.addDivision(add_division)
+        team.remove_division(removed_division)
+        team.add_division(add_division)
         return new_battle_group
 
     @property

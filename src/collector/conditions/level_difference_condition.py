@@ -2,10 +2,10 @@ from .condition import ICondition
 
 
 class LevelDifferenceCondition(ICondition):
-	def __init__(self, params):
-		super().__init__(params)
-		self.max_level_difference = params['max_level_difference']
-		self.teams_num = params['teams_num']
+	def __init__(self, rules):
+		super().__init__(rules)
+		self.max_level_difference = rules['max_level_difference']
+		self.teams_num = rules['teams_num']
 
 	@classmethod
 	def get_required_rule_fields(cls):
