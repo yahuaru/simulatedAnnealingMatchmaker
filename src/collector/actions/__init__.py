@@ -1,6 +1,6 @@
-from add_division_action import AddDivisionAction
-from swap_divisions_action import SwapDivisionsAction
-from swap_division_from_queue_action import SwapDivisionsFromQueueAction
-from remove_division_action import RemoveDivisionAction
+from .add_division_action import AddDivisionAction
+from .swap_divisions_action import SwapDivisionsAction
+from .swap_division_from_queue_action import SwapDivisionsFromQueueAction
+from .remove_division_action import RemoveDivisionAction
 
 ACTIONS = (AddDivisionAction, RemoveDivisionAction, SwapDivisionsFromQueueAction, SwapDivisionsAction)
