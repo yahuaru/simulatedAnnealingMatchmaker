@@ -5,7 +5,7 @@ from collector.conditions.team_size_condition import TeamSizeCondition
 CONDITIONS = (TeamSizeCondition, PlayerTypeNumDifferenceCondition, LevelDifferenceCondition)
 
 
-def buildConditions(params):
+def build_conditions(params):
     conditions = []
     param_fields = set(params.keys())
     for condition in CONDITIONS:

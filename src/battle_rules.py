@@ -2,7 +2,7 @@ import bisect
 from collections import namedtuple
 
 from collector import actions
-from collector.conditions import buildConditions
+from collector.conditions import build_conditions
 
 
 class BattleRules(object):
@@ -20,7 +20,7 @@ class BattleRules(object):
 
             conditions_param = param['conditions'].copy()
             conditions_param.update(common_conditions_params)
-            conditions = buildConditions(conditions_param)
+            conditions = build_conditions(conditions_param)
             state = RuleState(param['initial_temperature'], conditions_param, conditions, actions.ACTIONS)
             self._states.append(state)
 
