@@ -1,18 +1,20 @@
 import sys
 from typing import List
 
-from matchmaker_queue.key.queue_key_generator import IQueueKeyGenerator
+from matchmaker_queue.key.queue_key_condition import IQueueKeyCondition
 
 
-class QueueKeyByLevel(IQueueKeyGenerator):
-    REQUIRED_FIELDS = {"by_level", }
-
+class ByLevelQueueKeyCondition(IQueueKeyCondition):
     def __init__(self, params):
         super().__init__(params)
         by_level_rules = params['common_conditions']['by_level']
         self._max_level_difference = by_level_rules['max_level_difference']
         self._min_level = by_level_rules['min_level']
         self._max_level = by_level_rules['max_level']
+
+    @classmethod
+    def get_required_rule_fields(cls):
+        return {"by_level", }
 
     def get_key(self, division) -> List:
         return division.max_level

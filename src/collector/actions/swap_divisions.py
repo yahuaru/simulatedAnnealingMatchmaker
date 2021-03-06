@@ -1,7 +1,6 @@
 import random
 
 from collector.actions.action import ActionBase
-from battle_group import BattleGroup
 
 
 class SwapDivisionsAction(ActionBase):
@@ -9,7 +8,10 @@ class SwapDivisionsAction(ActionBase):
         super().__init__(params)
         self.__max_team_size = params['max_team_size']
 
-    def execute(self, queue, group_key, battle_group):
+    def execute(self, current_time, queue, group_key, battle_group):
+        if battle_group.is_empty():
+            return None
+
         teams = [(team_id, team) for team_id, team in enumerate(battle_group.teams)]
         team_entry = random.choice(teams)
         teams.remove(team_entry)
@@ -30,16 +32,16 @@ class SwapDivisionsAction(ActionBase):
         if division is not None and other_division is not None:
             if (division.size <= (other_division.size + self.__max_team_size - other_team.size)
                     and other_division.size <= (division.size + self.__max_team_size - team.size)):
-                new_battle_group = BattleGroup.swap_division(battle_group, team_id, division, other_division)
-                new_battle_group = BattleGroup.swap_division(new_battle_group, other_team_id, other_division, division)
+                new_battle_group = battle_group.swap_division(current_time, team_id, division, other_division)
+                new_battle_group = new_battle_group.swap_division(current_time, other_team_id, other_division, division)
                 return new_battle_group
         elif division is not None and division.size <= (self.__max_team_size - other_team.size):
-            new_battle_group = BattleGroup.remove_division(battle_group, team_id, division)
-            new_battle_group = BattleGroup.add_division(new_battle_group, other_team_id, division)
+            new_battle_group = battle_group.remove_division(current_time, team_id, division)
+            new_battle_group = new_battle_group.add_division(current_time, other_team_id, division)
             return new_battle_group
         elif other_division is not None and other_division.size <= (self.__max_team_size - team.size):
-            new_battle_group = BattleGroup.add_division(battle_group, team_id, other_division)
-            new_battle_group = BattleGroup.remove_division(new_battle_group, other_team_id, other_division)
+            new_battle_group = battle_group.add_division(current_time, team_id, other_division)
+            new_battle_group = new_battle_group.remove_division(current_time, other_team_id, other_division)
             return new_battle_group
 
         return None

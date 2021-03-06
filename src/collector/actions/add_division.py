@@ -10,7 +10,7 @@ class AddDivisionAction(ActionBase):
         self.__max_team_size = params['max_team_size']
         self.__added_division = None
 
-    def execute(self, queue, group_key, battle_group):
+    def execute(self, current_time, queue, group_key, battle_group):
         if not queue:
             return None
 
@@ -23,7 +23,7 @@ class AddDivisionAction(ActionBase):
         if division_from_queue is None:
             return None
 
-        new_battle_group = BattleGroup.add_division(battle_group, team_id, division_from_queue)
+        new_battle_group = battle_group.add_division(current_time, team_id, division_from_queue)
         self.__added_division = division_from_queue
 
         return new_battle_group
@@ -34,4 +34,3 @@ class AddDivisionAction(ActionBase):
     def on_rejected(self, queue, battle_type):
         queue.enqueue(battle_type, self.__added_division)
         self.__added_division = None
-

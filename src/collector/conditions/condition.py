@@ -13,5 +13,5 @@ class ICondition(ABC):
         return set()
 
     @abstractmethod
-    def check(self, battle_group):
+    def check(self, battle_group) -> int:
         return 0

@@ -9,7 +9,10 @@ class RemoveDivisionAction(ActionBase):
         super().__init__(params)
         self.__removed_division = None
 
-    def execute(self, queue, battle_type, battle_group):
+    def execute(self, current_time, queue, battle_type, battle_group):
+        if battle_group.is_empty():
+            return None
+
         not_empty_team = [(team_id, team) for team_id, team in enumerate(battle_group.teams) if team.size > 0]
         if not not_empty_team:
             return None
@@ -17,7 +20,7 @@ class RemoveDivisionAction(ActionBase):
         team_id, team = random.choice(not_empty_team)
         division = random.choice(team.divisions)
 
-        new_battle_group = BattleGroup.remove_division(battle_group, team_id, division)
+        new_battle_group = battle_group.remove_division(current_time, team_id, division)
 
         self.__removed_division = division
         return new_battle_group

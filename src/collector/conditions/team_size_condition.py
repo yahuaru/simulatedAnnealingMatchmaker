@@ -5,6 +5,7 @@ from .condition import ICondition
 class TeamSizeCondition(ICondition):
     def __init__(self, rules):
         super().__init__(rules)
+        self.__teams_num = rules['teams_num']
         self.__min_team_size = rules['min_team_size']
         self.__max_team_size = rules['max_team_size']
 
@@ -15,6 +16,9 @@ class TeamSizeCondition(ICondition):
         return {'min_team_size', 'max_team_size'}
 
     def check(self, battle_group):
+        if battle_group.is_empty():
+            return self.__teams_num * self.__min_team_size
+
         max_team_size = max(team.size for team in battle_group.teams)
 
         penalty = 0

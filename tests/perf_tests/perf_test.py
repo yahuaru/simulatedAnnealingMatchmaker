@@ -16,36 +16,24 @@ TEAM_SIZE = 3
 params = {
     'test_battle_group':
         {
-            'common_conditions': {
-                'teams_num': TEAMS_NUM,
-                'by_level': {
-                    'max_level_difference': 1,
-                    'min_level': 1,
-                    'max_level': 8,
-                }
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
             },
-            'by_time': {
-                0: {
-                    'conditions': {
-                        'min_team_size': TEAM_SIZE,
-                        'max_team_size': TEAM_SIZE,
-                        'player_type_num_diff': {
-                            PlayerType.ALPHA: 0,
-                            PlayerType.BETA: 0,
-                            PlayerType.GAMMA: 0,
-                        },
-                    },
-                    'initial_temperature': 3
-                },
-            }
+            'initial_temperature': 3,
         }
-}
+    }
 
 try_name = "n{}_ts{}_no_queue_split".format(TEAMS_NUM, TEAM_SIZE)
 
 try_data = []
 
-failed_attempts = 0
+
 mm = SimpleMatchmaker(params)
 
 index = 0
@@ -55,7 +43,9 @@ tries_csv = open('data/try_data_{}.csv'.format(try_name), mode='w')
 tries_data_writer = csv.DictWriter(tries_csv, ["final_iteration", "process_time"])
 tries_data_writer.writeheader()
 
-for j in range(10):
+failed_attempts = 0
+successful_attempts = 0
+for j in range(40):
     divisions_num = 1000
 
     for i in range(divisions_num):
@@ -70,7 +60,12 @@ for j in range(10):
     while divisions_left_num > TEAMS_NUM * TEAM_SIZE:
         start_time = time.process_time_ns()
         battle_group = mm.process()
-        print(battle_group)
         process_time = time.process_time_ns() - start_time
+        print(battle_group)
         divisions_left_num -= 12
         print(j, divisions_left_num)
+        if battle_group is None:
+            failed_attempts += 1
+        else:
+            successful_attempts += 1
+print(failed_attempts, successful_attempts)

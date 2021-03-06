@@ -15,20 +15,23 @@ class PlayerTypeNumDifferenceCondition(ICondition):
         return {"player_type_num_diff", "teams_num"}
 
     def check(self, battle_group):
-        penalty = 0
-        player_types = list(PlayerType)
-        player_types_num = len(player_types)
+        penalty_per_team = sum(self.__player_type_num_diff.values())
+        if battle_group.is_empty():
+            penalty_per_team = len(self.__player_type_num_diff)
+            return self.__teams_num * (self.__teams_num - 1) / 2 * penalty_per_team
 
+        penalty = 0
         for i, team in enumerate(battle_group.teams[:-1]):
             if team.size > 0:
                 for otherTeam in battle_group.teams[i + 1:]:
-                    for playerType in player_types:
+                    for playerType in PlayerType:
                         type_num = team.players_types_num[playerType]
                         other_type_num = otherTeam.players_types_num[playerType]
                         delta_ship_type = abs(type_num - other_type_num)
-                        if delta_ship_type > self.__player_type_num_diff[playerType]:
-                            penalty += 1
+                        player_type_num_diff = self.__player_type_num_diff[playerType]
+                        if delta_ship_type > player_type_num_diff:
+                            penalty += delta_ship_type - player_type_num_diff
             else:
-                penalty += (self.__teams_num - i - 1) * player_types_num
+                penalty += (self.__teams_num - i - 1) * penalty_per_team
 
         return penalty
