@@ -26,7 +26,6 @@ class SimpleMatchmaker:
         result, group = collector.process_battle_groups(current_time)
         process_time = time.time() - start_time
         while result == ProcessResult.NOT_COLLECTED and process_time < MAX_PROCESS_TIME:
-            current_time = time.time()
             result, group = collector.process_battle_groups(current_time)
             process_time = time.time() - start_time
         if result != ProcessResult.COLLECTED:

@@ -32,7 +32,6 @@ class GroupCollector:
         return False, None
 
     def process_battle_groups(self, current_time):
-        self.__battle_group.update_wait_time(current_time)
         current_state = self.__rules_collection.get_state(self.__battle_group)
         if current_state.penalty == 0:
             return ProcessResult.COLLECTED, self.__battle_group

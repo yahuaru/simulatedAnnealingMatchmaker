@@ -74,7 +74,9 @@ class BattleGroup:
     def __init__(self, teams=None, current_time=0):
         self.teams = teams if teams is not None else []
         self.wait_time = 0
-        self.update_wait_time(current_time)
+        if not self.is_empty():
+            enqueue_time = min(team.min_enqueue_time for team in self.teams if team.size != 0)
+            self.wait_time = current_time - enqueue_time
 
     def is_empty(self):
         return not any(team.size != 0 for team in self.teams)
@@ -110,14 +112,6 @@ class BattleGroup:
         teams = self.teams.copy()
         del teams[team_id]
         return BattleGroup(teams, current_time)
-
-    def update_wait_time(self, current_time):
-        if self.is_empty():
-            self.wait_time = 0
-            return
-
-        enqueue_time = min(team.min_enqueue_time for team in self.teams if team.size != 0)
-        self.wait_time = current_time - enqueue_time
 
     def __repr__(self) -> str:
         teams_repr = ""
