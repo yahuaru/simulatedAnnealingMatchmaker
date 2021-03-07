@@ -23,6 +23,7 @@ class GroupCollector:
 
         self.__current_iteration = 0
         self.__battle_group = BattleGroup()
+        self.__current_state = self.__rules_collection.get_state(self.__battle_group)
 
     def cleanup(self):
         for team in self.__battle_group.teams:
@@ -32,44 +33,39 @@ class GroupCollector:
         return False, None
 
     def process_battle_groups(self, current_time):
-        current_state = self.__rules_collection.get_state(self.__battle_group)
-        if current_state.penalty == 0:
-            return ProcessResult.COLLECTED, self.__battle_group
-
-        candidate, applied_action = self.__generate_candidate(current_time, self.__battle_group, current_state.rules)
+        candidate, applied_action = self.__generate_candidate(current_time, self.__battle_group, self.__current_state.rules)
         if candidate is None:
             return ProcessResult.NO_ACTIONS, None
 
         candidate_state = self.__rules_collection.get_state(candidate)
 
         if candidate_state.penalty == 0:
-            self.__accept_candidate(candidate, applied_action)
+            self.__accept_candidate(candidate, candidate_state, applied_action)
             return ProcessResult.COLLECTED, candidate
 
-        if candidate_state.penalty > current_state.penalty:
+        if candidate_state.penalty > self.__current_state.penalty:
             current_temperature = candidate_state.temperature
             if self.__current_iteration > 0:
                 current_temperature = candidate_state.temperature / math.log(1 + self.__current_iteration)
 
-            probability = math.exp(-(candidate_state.penalty - current_state.penalty) / current_temperature)
+            probability = math.exp(-(candidate_state.penalty - self.__current_state.penalty) / current_temperature)
             if random.random() < probability:
-                self.__accept_candidate(candidate, applied_action)
+                self.__accept_candidate(candidate, candidate_state, applied_action)
             else:
                 self.__reject_candidate(applied_action)
         else:
-            self.__accept_candidate(candidate, applied_action)
+            self.__accept_candidate(candidate, candidate_state, applied_action)
 
         self.__current_iteration += 1
 
         return ProcessResult.NOT_COLLECTED, None
 
-    def __accept_candidate(self, candidate, applied_action):
-        logging.debug("action approved Action:{}".format(applied_action.__class__))
+    def __accept_candidate(self, candidate, candidate_state, applied_action):
+        self.__current_state = candidate_state
         self.__battle_group = candidate
         applied_action.on_approved(self._queue, self._battle_type)
 
     def __reject_candidate(self, applied_action):
-        logging.debug("action rejected Action:{}".format(applied_action.__class__))
         applied_action.on_rejected(self._queue, self._battle_type)
 
     def __generate_candidate(self, current_time, battle_group, rules) -> Tuple:
