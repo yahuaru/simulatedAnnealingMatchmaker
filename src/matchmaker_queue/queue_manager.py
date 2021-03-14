@@ -1,7 +1,6 @@
 import random
 from typing import Dict, Optional
 
-from matchmaker_queue.key.queue_key_builder import QueueKeyBuilder
 from matchmaker_queue.queue import Queue
 from battle_group import Division
 

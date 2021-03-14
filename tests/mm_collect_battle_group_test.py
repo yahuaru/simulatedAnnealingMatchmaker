@@ -1,4 +1,4 @@
-import unittest  # The test framework
+import unittest
 
 from battle_group import Division
 from player import Player, PlayerType
@@ -12,25 +12,18 @@ class Test_CollectBattleGroup(unittest.TestCase):
     def setUp(self) -> None:
         self.params = {
             'test_battle_group':
-            {
-                'common_conditions': {
+                {
+                    'type': 'base',
                     'teams_num': TEAMS_NUM,
-                },
-                'by_time': {
-                    0: {
-                        'conditions': {
-                            'min_team_size': TEAM_SIZE,
-                            'max_team_size': TEAM_SIZE,
-                            'player_type_num_diff': {
-                                PlayerType.ALPHA: 0,
-                                PlayerType.BETA: 0,
-                                PlayerType.GAMMA: 0,
-                            },
-                        },
-                        'initial_temperature': 3
+                    'min_team_size': TEAM_SIZE,
+                    'max_team_size': TEAM_SIZE,
+                    'player_type_num_diff': {
+                        PlayerType.ALPHA: 0,
+                        PlayerType.BETA: 0,
+                        PlayerType.GAMMA: 0,
                     },
+                    'initial_temperature': 3,
                 }
-            }
         }
         self.mm = SimpleMatchmaker(self.params)
 
@@ -74,13 +67,15 @@ class Test_CollectBattleGroup(unittest.TestCase):
             for division in team.divisions:
                 assert division in divisions
                 divisions.remove(division)
+
         for i, team in enumerate(battle_group.teams):
             for otherTeam in battle_group.teams[i:]:
-                for playerType in list(PlayerType):
+                for playerType in PlayerType:
                     type_num = team.players_types_num[playerType]
                     other_type_num = otherTeam.players_types_num[playerType]
                     delta_type = abs(other_type_num - type_num)
-                    max_type_diff = self.params['test_battle_group']['by_time'][0]['conditions']['player_type_num_diff'][playerType]
+                    max_type_diff = \
+                    self.params['test_battle_group']['player_type_num_diff'][playerType]
                     self.assertLessEqual(delta_type, max_type_diff)
 
     # T: D(GAMMA, BETA), D(ALPHA)
@@ -110,11 +105,12 @@ class Test_CollectBattleGroup(unittest.TestCase):
                 divisions.remove(division)
         for i, team in enumerate(battle_group.teams):
             for otherTeam in battle_group.teams[i:]:
-                for playerType in list(PlayerType):
+                for playerType in PlayerType:
                     type_num = team.players_types_num[playerType]
                     other_type_num = otherTeam.players_types_num[playerType]
                     delta_type = abs(other_type_num - type_num)
-                    max_type_diff = self.params['test_battle_group']['by_time'][0]['conditions']['player_type_num_diff'][playerType]
+                    max_type_diff = \
+                    self.params['test_battle_group']['player_type_num_diff'][playerType]
                     self.assertLessEqual(delta_type, max_type_diff)
 
 
