@@ -1,4 +1,4 @@
-from battle_group import BattleGroup
+from battle_group.battle_group import BattleGroup
 from .action import ActionBase
 
 

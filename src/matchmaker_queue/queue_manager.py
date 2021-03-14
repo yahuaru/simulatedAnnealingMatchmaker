@@ -2,7 +2,7 @@ import random
 from typing import Dict, Optional
 
 from matchmaker_queue.queue import Queue
-from battle_group import Division
+from battle_group.division import Division
 
 
 class QueueManager:

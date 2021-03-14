@@ -1,6 +1,6 @@
 import random
 
-from battle_group import Division
+from battle_group.division import Division
 from player import Player, PlayerType
 
 

@@ -4,7 +4,7 @@ import random
 from enum import IntEnum, auto
 from typing import Tuple
 
-from battle_group import BattleGroup
+from battle_group.battle_group import BattleGroup
 from collector.actions import random_actions_generator
 
 

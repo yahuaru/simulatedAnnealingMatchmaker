@@ -1,6 +1,6 @@
 import unittest
 
-from battle_group import Division
+from battle_group.division import Division
 from player import Player, PlayerType
 from simple_matchmaker import SimpleMatchmaker
 
