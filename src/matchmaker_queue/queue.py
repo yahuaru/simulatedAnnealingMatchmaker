@@ -9,15 +9,12 @@ POP_PRIORITY_COEFFICIENT = 0.2
 
 class Queue(object):
     def __init__(self):
-        self._divisions = {}
         self._queue_by_size = {}
 
     def is_empty(self):
         return len(self._queue_by_size) == 0
 
     def enqueue(self, division):
-        assert division.id not in self._divisions
-        # stir little bit, so division didn't place with the same divisions again
         entry = QueueEntry(division.enqueue_time, division.id, division)
         queue = self._queue_by_size.setdefault(division.size, [])
         bisect.insort(queue, entry)
