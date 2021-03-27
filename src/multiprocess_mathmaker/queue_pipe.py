@@ -5,7 +5,8 @@ from multiprocess_mathmaker.queue_process import Actions
 
 
 class QueueManagerProxy:
-    def __init__(self, connector: connection.Connection):
+    def __init__(self, queue, connector: connection.Connection):
+        self._queue = queue
         self._connector = connector
 
     def pop(self, battle_type, battle_group, division_size) -> Division:
@@ -13,4 +14,4 @@ class QueueManagerProxy:
         return self._connector.recv()
 
     def enqueue(self, battle_type, division):
-        self._connector.send((Actions.ENQUEUE, (battle_type, division)))
+        self._queue.put((battle_type, division))

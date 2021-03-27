@@ -9,9 +9,9 @@ from collector.actions import random_actions_generator
 
 
 class ProcessResult(IntEnum):
-    COLLECTED = auto()
-    NOT_COLLECTED = auto()
-    NO_ACTIONS = auto()
+    COLLECTED = 1
+    NOT_COLLECTED = 2
+    NO_ACTIONS = 3
 
 
 class GroupCollector:
@@ -29,8 +29,6 @@ class GroupCollector:
         for team in self.__battle_group.teams:
             for division in team.divisions:
                 self._queue.enqueue(self._battle_type, division)
-        self.__battle_group = None
-        return False, None
 
     def process_battle_groups(self, current_time):
         candidate, applied_action = self.__generate_candidate(current_time, self.__battle_group, self.__current_state.rules)

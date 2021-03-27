@@ -1,3 +1,4 @@
+import csv
 import random
 import time
 from multiprocessing import Process
@@ -5,14 +6,14 @@ from multiprocessing import Process
 from collector.group_collector import GroupCollector, ProcessResult
 from multiprocess_mathmaker.queue_pipe import QueueManagerProxy
 
-MAX_PROCESS_TIME = 0.7
+MAX_PROCESS_TIME = 1.4
 
 
 class GroupCollectorProcess(Process):
     def __init__(self, result_queue, queue_connector, rules_collections):
         super().__init__(daemon=True)
         self._result_queue = result_queue
-        self._queue_proxy = QueueManagerProxy(queue_connector)
+        self._queue_proxy = queue_connector
         self._rules_collections = rules_collections
         self._available_battle_types = list(rules_collections.keys())
 
@@ -26,7 +27,7 @@ class GroupCollectorProcess(Process):
                 current_time = start_time = time.time()
                 result, group = collector.process_battle_groups(current_time)
                 process_time = time.time() - start_time
-                while result == ProcessResult.NOT_COLLECTED:# and process_time < MAX_PROCESS_TIME:
+                while result == ProcessResult.NOT_COLLECTED and process_time < MAX_PROCESS_TIME:
                     result, group = collector.process_battle_groups(current_time)
                     process_time = time.time() - start_time
                 if result != ProcessResult.COLLECTED:
@@ -36,4 +37,3 @@ class GroupCollectorProcess(Process):
         except Exception as e:
             print(e)
             raise e
-

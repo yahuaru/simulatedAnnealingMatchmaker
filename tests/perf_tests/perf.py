@@ -24,15 +24,9 @@ params = {
                 PlayerType.BETA: 0,
                 PlayerType.GAMMA: 0,
             },
-            'initial_temperature': 3,
+            'initial_temperature': 4,
         }
     }
-
-try_name = "n{}_ts{}_no_queue_split".format(TEAMS_NUM, TEAM_SIZE)
-
-try_data = []
-
-
 
 index = 0
 # iterations_csv = open('data/iterations_data_{}.csv'.format(try_name), mode='w')
@@ -41,23 +35,47 @@ iterations_data_writer = None
 # tries_data_writer = csv.DictWriter(tries_csv, ["final_iteration", "process_time"])
 # tries_data_writer.writeheader()
 
+divisions_num = 4000
+divisions_left_num = 0
+mm = None
+isActive = True
+
+
+def on_result(result):
+    global failed_attempts
+    global successful_attempts
+    global divisions_left_num
+    global index
+    global mm
+    global isActive
+
+    result, battle_group = result
+    if battle_group is None:
+        failed_attempts += 1
+    else:
+        successful_attempts += 1
+    print(result, isActive, successful_attempts, failed_attempts)
+    if successful_attempts > 300:
+        isActive = False
+        mm.terminate()
+
+
 if __name__ == '__main__':
-    mm = MatchmakerProcessManager(1, params)
+    mm = MatchmakerProcessManager(4, params, on_result)
     failed_attempts = 0
     successful_attempts = 0
 
-
     mm.start_process()
-    for j in range(40):
-        divisions_num = 1000
 
-        for i in range(divisions_num):
-            enqueue_time = random.random() * 100.0
-            division = generate_division(index, 3, enqueue_time, 1, 8)
-            index += 1
-            mm.enqueue_division("test_battle_group", division)
-    while True:
+    for i in range(divisions_num):
+        enqueue_time = random.random() * 100.0
+        division = generate_division(index, 3, enqueue_time, 1, 8)
+        index += 1
+        mm.enqueue_division("test_battle_group", division)
+    divisions_left_num += divisions_num
+    while isActive:
         pass
+    mm.join()
 #
 # battle_group = mm.process()
 # try_data = []
