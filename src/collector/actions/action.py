@@ -8,11 +8,11 @@ class ActionBase(ABC):
         pass
 
     @abstractmethod
-    def execute(self, current_time, queue, battle_type, battle_group: BattleGroup):
+    def execute(self, current_time, queue, battle_group: BattleGroup):
         pass
 
-    def on_approved(self, queue, battle_type):
+    def on_approved(self, queue):
         pass
 
-    def on_rejected(self, queue, battle_type):
+    def on_rejected(self, queue):
         pass

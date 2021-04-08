@@ -8,7 +8,7 @@ class SwapDivisionsAction(ActionBase):
         super().__init__(params)
         self.__max_team_size = params['max_team_size']
 
-    def execute(self, current_time, queue, group_key, battle_group):
+    def execute(self, current_time, queue, battle_group):
         if battle_group.is_empty():
             return None
 

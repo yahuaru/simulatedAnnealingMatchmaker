@@ -1,6 +1,7 @@
 import csv
 import random
 import time
+from threading import RLock
 
 from multiprocess_mathmaker.matcmaker import MatchmakerProcessManager
 from player import PlayerType
@@ -25,57 +26,260 @@ params = {
                 PlayerType.GAMMA: 0,
             },
             'initial_temperature': 4,
-        }
+        },
+    'test_battle_group_1':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+    'test_battle_group_2':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+    'test_battle_group_3':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+    'test_battle_group_4':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+    'test_battle_group_5':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+    'test_battle_group_6':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+    'test_battle_group_7':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+    'test_battle_group_8':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+
+    'test_battle_group_9':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+
+    'test_battle_group_10':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+
+    'test_battle_group_11':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+    'test_battle_group_12':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+
+    'test_battle_group_13':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+    'test_battle_group_14':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+
+    'test_battle_group_15':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+    'test_battle_group_16':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
+
+    'test_battle_group_17':
+        {
+            'type': 'base',
+            'teams_num': TEAMS_NUM,
+            'min_team_size': TEAM_SIZE,
+            'max_team_size': TEAM_SIZE,
+            'player_type_num_diff': {
+                PlayerType.ALPHA: 0,
+                PlayerType.BETA: 0,
+                PlayerType.GAMMA: 0,
+            },
+            'initial_temperature': 4,
+        },
     }
 
-index = 0
-# iterations_csv = open('data/iterations_data_{}.csv'.format(try_name), mode='w')
-iterations_data_writer = None
-# tries_csv = open('data/try_data_{}.csv'.format(try_name), mode='w')
-# tries_data_writer = csv.DictWriter(tries_csv, ["final_iteration", "process_time"])
-# tries_data_writer.writeheader()
-
 divisions_num = 4000
-divisions_left_num = 0
-mm = None
-isActive = True
-
-
-def on_result(result):
-    global failed_attempts
-    global successful_attempts
-    global divisions_left_num
-    global index
-    global mm
-    global isActive
-
-    result, battle_group = result
-    if battle_group is None:
-        failed_attempts += 1
-    else:
-        successful_attempts += 1
-    print(result, isActive, successful_attempts, failed_attempts)
-    if successful_attempts > 300:
-        isActive = False
-        mm.terminate()
-
 
 if __name__ == '__main__':
-    mm = MatchmakerProcessManager(4, params, on_result)
-    failed_attempts = 0
-    successful_attempts = 0
+    for process_num in range(1, 25):
+        print("start_process", process_num)
+        index = 0
+        mm = MatchmakerProcessManager(process_num, params)
+        for bt in params:
+            for i in range(divisions_num):
+                enqueue_time = random.random() * 100.0
+                division = generate_division(index, 3, enqueue_time, 1, 8)
+                index += 1
+                mm.enqueue_division(bt, division)
 
-    mm.start_process()
-
-    for i in range(divisions_num):
-        enqueue_time = random.random() * 100.0
-        division = generate_division(index, 3, enqueue_time, 1, 8)
-        index += 1
-        mm.enqueue_division("test_battle_group", division)
-    divisions_left_num += divisions_num
-    while isActive:
-        pass
-    mm.join()
+        results = mm.start_process()
+        print("finish_process", process_num)
+        with open('data/process_collection_time_bt_{}.csv'.format(process_num), 'w', newline='') as tries_csv:
+            tries_data_writer = csv.DictWriter(tries_csv, ["process", "result", "start_time", "finish_time"])
+            tries_data_writer.writeheader()
+            print(len(results))
+            for i, result in enumerate(results):
+                for iteration in result:
+                    start_time, finish_time, result_code = iteration
+                    tries_data_writer.writerow({"process": i, "result": result_code, "start_time": start_time, "finish_time": finish_time})
 #
 # battle_group = mm.process()
 # try_data = []

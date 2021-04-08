@@ -1,7 +1,6 @@
 import random
 
 from collector.actions.action import ActionBase
-from battle_group.battle_group import BattleGroup
 
 
 class AddDivisionAction(ActionBase):
@@ -10,7 +9,7 @@ class AddDivisionAction(ActionBase):
         self.__max_team_size = params['max_team_size']
         self.__added_division = None
 
-    def execute(self, current_time, queue, group_key, battle_group):
+    def execute(self, current_time, queue, battle_group):
         if not queue:
             return None
 
@@ -19,7 +18,7 @@ class AddDivisionAction(ActionBase):
             return None
 
         team_id, vacant_team = random.choice(vacant_teams)
-        division_from_queue = queue.pop(group_key, battle_group, self.__max_team_size - vacant_team.size)
+        division_from_queue = queue.pop(battle_group, self.__max_team_size - vacant_team.size)
         if division_from_queue is None:
             return None
 
@@ -28,9 +27,9 @@ class AddDivisionAction(ActionBase):
 
         return new_battle_group
 
-    def on_approved(self, queue, battle_type):
+    def on_approved(self, queue):
         self.__added_division = None
 
-    def on_rejected(self, queue, battle_type):
-        queue.enqueue(battle_type, self.__added_division)
+    def on_rejected(self, queue):
+        queue.enqueue(self.__added_division)
         self.__added_division = None

@@ -11,6 +11,9 @@ class Queue(object):
     def __init__(self):
         self._queue_by_size = {}
 
+    def __len__(self):
+        return sum(len(queue) for queue in self._queue_by_size.values())
+
     def is_empty(self):
         return len(self._queue_by_size) == 0
 

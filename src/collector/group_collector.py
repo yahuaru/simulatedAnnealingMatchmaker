@@ -15,8 +15,7 @@ class ProcessResult(IntEnum):
 
 
 class GroupCollector:
-    def __init__(self, queue, battle_type, rules_collection):
-        self._battle_type = battle_type
+    def __init__(self, queue, rules_collection):
         self._queue = queue
 
         self.__rules_collection = rules_collection
@@ -28,7 +27,7 @@ class GroupCollector:
     def cleanup(self):
         for team in self.__battle_group.teams:
             for division in team.divisions:
-                self._queue.enqueue(self._battle_type, division)
+                self._queue.enqueue(division)
 
     def process_battle_groups(self, current_time):
         candidate, applied_action = self.__generate_candidate(current_time, self.__battle_group, self.__current_state.rules)
@@ -61,14 +60,14 @@ class GroupCollector:
     def __accept_candidate(self, candidate, candidate_state, applied_action):
         self.__current_state = candidate_state
         self.__battle_group = candidate
-        applied_action.on_approved(self._queue, self._battle_type)
+        applied_action.on_approved(self._queue)
 
     def __reject_candidate(self, applied_action):
-        applied_action.on_rejected(self._queue, self._battle_type)
+        applied_action.on_rejected(self._queue)
 
     def __generate_candidate(self, current_time, battle_group, rules) -> Tuple:
         for action in random_actions_generator(rules):
-            new_battle_group = action.execute(current_time, self._queue, self._battle_type, battle_group)
+            new_battle_group = action.execute(current_time, self._queue, battle_group)
             if new_battle_group is not None:
                 return new_battle_group, action
 
